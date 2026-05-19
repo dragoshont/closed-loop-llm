@@ -899,7 +899,7 @@
         <div class="slide-content">
             <div class="section-tag reveal">§ 1 · the gap</div>
             <h2 class="reveal" style="max-width: 950px;">Most LLM usage today is fundamentally <em>stateless</em>.</h2>
-            <p class="reveal" style="max-width: 750px; margin-top: var(--element-gap);">We prompt. The model answers. The learning dies at the end of the interaction. Tomorrow, the same input gives the same answer.</p>
+            <p class="reveal" style="max-width: 800px; margin-top: var(--element-gap);">We send a prompt, the model returns an answer, and the moment that response is delivered, every signal we could have learned from is gone. The same question tomorrow produces an answer with the same gaps, because nothing in the system has changed.</p>
         </div>
     </section>
 
@@ -1132,12 +1132,12 @@
                 <div class="compare-col before">
                     <div class="label">Ask #1 · empty memory</div>
                     <div class="memory-state">(no preferences known yet)</div>
-                    <div class="response">"Consider trying an <em>outdoor adventure like hiking</em> at your local state park or exploring nature trails. Fresh air, beautiful scenery, staying active."</div>
+                    <div class="response">"Consider trying an <em>outdoor adventure like hiking</em> at your local state park, or exploring nature trails to enjoy fresh air and beautiful scenery while staying active."</div>
                 </div>
                 <div class="compare-col after">
                     <div class="label">Ask #2 · after feedback</div>
                     <div class="memory-state">dislikes: outdoor activities<br>constraints: tight budget</div>
-                    <div class="response">"Consider visiting your local <em>library's free events section</em> or exploring an <em>online virtual museum tour</em>. Culture and learning, <em>without spending money</em>."</div>
+                    <div class="response">"Consider visiting your local <em>library's free events section</em> or exploring an <em>online virtual museum tour</em> to enjoy culture and learning <em>without spending money</em>."</div>
                 </div>
             </div>
             <p class="reveal" style="text-align: center; margin-top: var(--content-gap); max-width: 800px; margin-left: auto; margin-right: auto;">The prompt template re-rendered because <code>memory.json</code> mutated. That's it. That's the loop.</p>
