@@ -887,7 +887,7 @@
             <div class="accent-line reveal"></div>
             <h1 class="reveal">Designing<br><span class="accent-word">Self-Improving</span><br>Systems with LLMs</h1>
             <p class="subtitle reveal">From chatbots to closed-loop software.</p>
-            <p class="meta reveal">Dragos Hont · Software Engineering</p>
+            <p class="meta reveal">Dragos Hont · @dragoshont</p>
         </div>
     </section>
 
@@ -911,10 +911,9 @@
         <span class="slide-num">02</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 1 · the shift</div>
-            <h2 class="reveal">The real shift isn't to <em>better prompts</em>.<br>It's not to <em>bigger models</em>.</h2>
-            <h2 class="reveal" style="margin-top: var(--element-gap); color: var(--accent);">It's to better systems.</h2>
-            <p class="reveal" style="max-width: 800px; margin-top: var(--content-gap);">Systems where LLMs operate inside <strong>closed loops</strong>, produce <strong>persistent artifacts</strong>, evaluate their own outputs, and get better over time, without anyone retraining anything.</p>
-            <p class="reveal" style="max-width: 800px;">Familiar engineering principles, state, evaluation, iteration, observability, applied to a new kind of system.</p>
+            <h2 class="reveal">The real shift isn't to better prompts or bigger models.<br><span style="color: var(--accent);">It's to better systems.</span></h2>
+            <p class="reveal" style="max-width: 800px; margin-top: var(--content-gap);">Systems where LLMs operate inside <strong>closed loops</strong>, produce <strong>persistent artifacts</strong>, evaluate their own outputs, and get better over time without anyone retraining anything.</p>
+            <p class="reveal" style="max-width: 800px;">The future of AI systems is probably less about bigger models, and more about systems that improve themselves over time. Familiar engineering principles (state, evaluation, iteration, observability) applied to a new kind of system.</p>
         </div>
     </section>
 
@@ -955,43 +954,19 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 6, COMPONENTS OF THE LOOP
+         SLIDE 6 deleted in adversarial review pass:
+         abstract "4 load-bearing pieces" card grid duplicated Mihai's anatomy
+         slide pattern and its prose was rhetorical, not technical.
+         The loop diagram (slide 5) names these concepts; the demo architecture
+         (slide 11) shows them concretely with real file names. Middle abstraction
+         not needed.
     ========================================================== -->
-    <section class="slide bg-grid">
-        <span class="slide-num">05</span>
-        <div class="slide-content">
-            <div class="section-tag reveal">§ 2 · what makes the loop</div>
-            <h2 class="reveal">Four load-bearing pieces.</h2>
-            <div class="grid-4">
-                <div class="comp-card reveal-scale" style="transition-delay: 0.1s;">
-                    <div class="icon">01 · EVALUATORS</div>
-                    <h3>Turn outputs into signals.</h3>
-                    <p>Programmatic judges, sometimes deterministic, sometimes LLM-based, that convert unstructured outputs into structured pass/fail, scores, or extracted facts.</p>
-                </div>
-                <div class="comp-card reveal-scale" style="transition-delay: 0.18s;">
-                    <div class="icon">02 · MEMORY</div>
-                    <h3>State outlives the request.</h3>
-                    <p>Persistent storage, JSON on disk in the smallest version, a database in production, that survives the call and shapes the next one.</p>
-                </div>
-                <div class="comp-card reveal-scale" style="transition-delay: 0.26s;">
-                    <div class="icon">03 · TELEMETRY</div>
-                    <h3>Execution traces, not vibes.</h3>
-                    <p>Every step recorded. Inputs, evaluator verdicts, memory deltas, next prompts. Without traces, the loop is undebuggable.</p>
-                </div>
-                <div class="comp-card reveal-scale" style="transition-delay: 0.34s;">
-                    <div class="icon">04 · RUNTIME ADAPTATION</div>
-                    <h3>The prompt changes.</h3>
-                    <p>Because the memory changed. No gradients. No retraining. The next prompt is mechanically different, and the audience can inspect why.</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- ==========================================================
          SLIDE 7, RETRIEVAL VS ADAPTATION
     ========================================================== -->
     <section class="slide mesh-bg bg-lines">
-        <span class="slide-num">06</span>
+        <span class="slide-num">05</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 3 · the dichotomy</div>
             <h2 class="reveal">Retrieval ≠ Behavioral adaptation.</h2>
@@ -1024,7 +999,7 @@
          SLIDE 8, THE LINE: retrieval vs adaptation
     ========================================================== -->
     <section class="slide line-slide mesh-bg bg-orbit">
-        <span class="slide-num">07</span>
+        <span class="slide-num">06</span>
         <div class="slide-content">
             <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
             <div class="big-line reveal">
@@ -1038,10 +1013,10 @@
          SLIDE 9, AUTORESEARCH (canonical example)
     ========================================================== -->
     <section class="slide bg-grid">
-        <span class="slide-num">08</span>
+        <span class="slide-num">07</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 4 · canonical example</div>
-            <h2 class="reveal"><code style="font-size: 0.85em;">karpathy/autoresearch</code>, the loop, in four files.</h2>
+            <h2 class="reveal"><code style="font-size: 0.85em;">karpathy/autoresearch</code>: the loop in four files.</h2>
             <p class="reveal" style="max-width: 800px; margin-top: var(--element-gap);">An AI agent runs research overnight on a single-GPU GPT training setup. ~100 experiments while you sleep.</p>
             <div class="file-frame reveal">
                 <div class="file-card">
@@ -1053,7 +1028,7 @@
                 <div class="file-card">
                     <div class="file-name">train.py</div>
                     <div class="file-role">behavioral adaptation</div>
-                    <div class="file-desc">The full GPT model + optimizer + loop. Architecture, hyperparams, all fair game.</div>
+                    <div class="file-desc">The full GPT model + optimizer + loop. Architecture and hyperparams: all fair game.</div>
                     <div class="file-actor">→ agent edits this</div>
                 </div>
                 <div class="file-card">
@@ -1076,7 +1051,7 @@
          SLIDE 10, AUTORESEARCH ANCHOR LINE
     ========================================================== -->
     <section class="slide line-slide mesh-bg bg-orbit">
-        <span class="slide-num">09</span>
+        <span class="slide-num">08</span>
         <div class="slide-content">
             <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
             <div class="big-line reveal">
@@ -1084,7 +1059,7 @@
                 The agent edits <code style="font-size: 0.95em;">train.py</code>.<br>
                 <span class="accent-word">Neither edits the model.</span>
             </div>
-            <div class="attribution reveal">// AUTORESEARCH, IN ONE SENTENCE</div>
+            <div class="attribution reveal">// THIS IS NOT MODEL RETRAINING</div>
         </div>
     </section>
 
@@ -1092,7 +1067,7 @@
          SLIDE 11, OUR DEMO ARCHITECTURE
     ========================================================== -->
     <section class="slide bg-grid">
-        <span class="slide-num">10</span>
+        <span class="slide-num">09</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 5 · the demo</div>
             <h2 class="reveal">Same idea. Smaller scope. ~170 lines of Python.</h2>
@@ -1111,7 +1086,7 @@
                 <div class="file-card">
                     <div class="file-name">memory.json</div>
                     <div class="file-role">memory</div>
-                    <div class="file-desc">The persistent state. Likes, dislikes, constraints, notes. The file the audience watches mutate.</div>
+                    <div class="file-desc">The persistent state. Likes, dislikes, constraints, notes. Mutated by every feedback call.</div>
                 </div>
                 <div class="file-card">
                     <div class="file-name">demo.py</div>
@@ -1129,7 +1104,7 @@
          SLIDE 12, LIVE DEMO PLACEHOLDER
     ========================================================== -->
     <section class="slide demo-screen mesh-bg bg-orbit">
-        <span class="slide-num">11</span>
+        <span class="slide-num">10</span>
         <div class="slide-content">
             <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
             <div class="big-cue reveal">→ live demo</div>
@@ -1153,20 +1128,20 @@
          SLIDE 13, BEFORE / AFTER
     ========================================================== -->
     <section class="slide bg-grid">
-        <span class="slide-num">12</span>
+        <span class="slide-num">11</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 5 · what just happened</div>
             <h2 class="reveal">Same prompt. Same model. Same temperature.</h2>
             <div class="compare reveal">
                 <div class="compare-col before">
-                    <div class="label">Ask #1, empty memory</div>
+                    <div class="label">Ask #1 · empty memory</div>
                     <div class="memory-state">(no preferences known yet)</div>
-                    <div class="response">"Consider trying an <em>outdoor adventure like hiking</em> in your local nature reserve, fresh air, exercise, perfect for the weekend."</div>
+                    <div class="response">"Consider trying an <em>outdoor adventure like hiking</em> in your local nature reserve. Fresh air, exercise, perfect for the weekend."</div>
                 </div>
                 <div class="compare-col after">
-                    <div class="label">Ask #2, after feedback</div>
+                    <div class="label">Ask #2 · after feedback</div>
                     <div class="memory-state">dislikes: outdoor activities<br>constraints: tight budget</div>
-                    <div class="response">"Consider exploring your local <em>library's digital resources</em> or joining an <em>online course</em>, <em>it's free</em> and can be done <em>from home</em>."</div>
+                    <div class="response">"Consider exploring your local <em>library's digital resources</em> or joining an <em>online course</em>. <em>It's free</em>, and can be done <em>from home</em>."</div>
                 </div>
             </div>
             <p class="reveal" style="text-align: center; margin-top: var(--content-gap); max-width: 800px; margin-left: auto; margin-right: auto;">The prompt template re-rendered because <code>memory.json</code> mutated. That's it. That's the loop.</p>
@@ -1178,13 +1153,13 @@
          Density audit: 1 heading + 2 paragraphs + 1 callout note. Within limits.
     ========================================================== -->
     <section class="slide bg-grid">
-        <span class="slide-num">13</span>
+        <span class="slide-num">12</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 5 · be precise</div>
             <h2 class="reveal">This demo shows <em>adaptation</em>. Not <em>improvement</em>.</h2>
             <p class="reveal" style="max-width: 850px; margin-top: var(--element-gap);">The behavior changed. That's adaptation. But there's no goal-aligned metric, no convergence, nothing that lets me say the system is <strong>getting better</strong>.</p>
             <p class="reveal" style="max-width: 850px;">Improvement = adaptation <strong>+</strong> a goal-aligned evaluator <strong>+</strong> iteration that converges. Autoresearch supplies the missing piece. This demo is the substrate.</p>
-            <div class="note reveal"><strong>credibility move</strong>Saying this out loud, before the skeptic in the third row raises a hand, is worth more than the demo itself.</div>
+            <div class="note reveal"><strong>credibility move</strong>Saying this out loud, before the objection lands, is worth more than the demo itself.</div>
         </div>
     </section>
 
@@ -1192,7 +1167,7 @@
          SLIDE 15, FAILURE MODES
     ========================================================== -->
     <section class="slide bg-grid">
-        <span class="slide-num">14</span>
+        <span class="slide-num">13</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 6 · the dark side</div>
             <h2 class="reveal">When the loop hurts you.</h2>
@@ -1210,6 +1185,7 @@
                     <tr><td>hallucination persistence</td><td>The evaluator extracted a confident lie. Now it's "fact" in memory forever.</td></tr>
                     <tr><td>echo chambers</td><td>The system narrows. Surprise disappears. Personalization becomes a cage.</td></tr>
                     <tr><td>evaluator failure</td><td>The LLM judging the LLM is wrong, confidently and silently. Turtles all the way down.</td></tr>
+                    <tr><td>bad adaptation loops</td><td>The system optimises for the signal you measured, not the goal you wanted. Goodhart, at runtime.</td></tr>
                 </tbody>
             </table>
         </div>
@@ -1219,7 +1195,7 @@
          SLIDE 16, THE LINE: self-degradation
     ========================================================== -->
     <section class="slide line-slide mesh-bg bg-orbit">
-        <span class="slide-num">15</span>
+        <span class="slide-num">14</span>
         <div class="slide-content">
             <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
             <div class="big-line reveal">
@@ -1233,7 +1209,7 @@
          Density audit: 1 heading + 4 bullets (within 4–6 limit). Quote folded into final bullet.
     ========================================================== -->
     <section class="slide mesh-bg bg-lines">
-        <span class="slide-num">16</span>
+        <span class="slide-num">15</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 7 · where this lands</div>
             <h2 class="reveal">Most production AI systems improve<br>at the <span style="color: var(--accent);">orchestration layer</span>.</h2>
@@ -1241,7 +1217,7 @@
                 <li class="reveal">Persistent skills accumulate. Reusable workflows compound.</li>
                 <li class="reveal">Eval-driven prompt iteration replaces ad-hoc prompt engineering.</li>
                 <li class="reveal">Execution traces become the dataset for the next round of iteration.</li>
-                <li class="reveal">The interesting question is no longer <em>“which model?”</em>, it's <em>“do we have the right loop?”</em></li>
+                <li class="reveal">The interesting question is no longer <em>“which model?”</em> It's <em>“do we have the right loop?”</em></li>
             </ul>
         </div>
     </section>
@@ -1254,13 +1230,7 @@
             <div class="accent-line reveal" style="margin: 0 auto;"></div>
             <h1 class="reveal" style="font-size: clamp(1.8rem, 5vw, 4rem);">Thank you.</h1>
             <p class="subtitle reveal" style="max-width: 800px;">The model is the least interesting component.<br>The interesting work is the system around it.</p>
-            <p class="reveal" style="max-width: 750px; color: var(--text-secondary); margin-top: var(--element-gap); font-style: italic;">The next talk takes you deeper into exactly that, the harness, the engineering discipline. Hand off.</p>
-
-            <div class="reveal" style="margin-top: var(--content-gap); display: flex; flex-direction: column; gap: 0.6rem; align-items: center;">
-                <a href="https://aka.ms/cll-demo" target="_blank" class="cta-link" style="letter-spacing: 0.08em;">AKA.MS/CLL-DEMO</a>
-                <p style="font-size: var(--small-size); color: var(--text-secondary); max-width: 600px;">runnable demo · talk source · ~170 lines of stdlib Python</p>
-            </div>
-
+            <a href="https://aka.ms/cll-demo" target="_blank" class="cta-link reveal" style="letter-spacing: 0.08em; margin-top: var(--content-gap);">AKA.MS/CLL-DEMO</a>
             <p class="meta reveal" style="margin-top: var(--content-gap);">Dragos Hont · @dragoshont</p>
         </div>
     </section>
