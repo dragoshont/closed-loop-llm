@@ -633,7 +633,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: clamp(0.4rem, 1.2vw, 1rem);
+            gap: clamp(0.6rem, 1.6vw, 1.4rem);
             flex-wrap: wrap;
             margin-top: var(--content-gap);
             width: 100%;
@@ -642,12 +642,14 @@
             background: var(--bg-card);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 6px;
-            padding: clamp(0.55rem, 1.1vw, 0.85rem) clamp(0.85rem, 1.6vw, 1.3rem);
+            padding: clamp(0.55rem, 1.1vw, 0.85rem) clamp(1rem, 2vw, 1.6rem);
             font-family: var(--font-mono);
             font-size: clamp(0.78rem, 1.15vw, 1rem);
             font-weight: 500;
             color: var(--text-primary);
             white-space: nowrap;
+            min-width: clamp(90px, 11vw, 140px);
+            text-align: center;
         }
         .loop-node.active {
             border-color: var(--accent);
