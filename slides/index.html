@@ -948,7 +948,25 @@
                 <div class="loop-node active">adapt</div>
                 <span class="loop-arrow">↻</span>
             </div>
-            <p class="reveal" style="max-width: 800px; margin-top: var(--content-gap);">The model does one part of one step. The system does everything else.<br>That "everything else" is where the engineering lives, and where improvement compounds.</p>
+            <div class="reveal" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(0.6rem, 1.5vw, 1.3rem); margin-top: var(--content-gap); width: 100%; max-width: 1000px;">
+                <div>
+                    <div style="font-family: var(--font-mono); font-size: clamp(0.65rem, 0.95vw, 0.8rem); color: var(--accent); letter-spacing: 0.12em; margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);">01 · ACT</div>
+                    <p style="font-size: clamp(0.78rem, 1.1vw, 0.95rem); line-height: 1.45; color: var(--text-secondary);">Do the work the user asked for. Return a result. The model usually lives here.</p>
+                </div>
+                <div>
+                    <div style="font-family: var(--font-mono); font-size: clamp(0.65rem, 0.95vw, 0.8rem); color: var(--accent); letter-spacing: 0.12em; margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);">02 · EVALUATE</div>
+                    <p style="font-size: clamp(0.78rem, 1.1vw, 0.95rem); line-height: 1.45; color: var(--text-secondary);">Turn the unstructured result into a structured signal. Code, regex, or a schema-constrained model call.</p>
+                </div>
+                <div>
+                    <div style="font-family: var(--font-mono); font-size: clamp(0.65rem, 0.95vw, 0.8rem); color: var(--accent); letter-spacing: 0.12em; margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);">03 · PERSIST</div>
+                    <p style="font-size: clamp(0.78rem, 1.1vw, 0.95rem); line-height: 1.45; color: var(--text-secondary);">Write the signal somewhere durable. JSON, database, log. The request ends; the signal does not.</p>
+                </div>
+                <div>
+                    <div style="font-family: var(--font-mono); font-size: clamp(0.65rem, 0.95vw, 0.8rem); color: var(--accent); letter-spacing: 0.12em; margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);">04 · ADAPT</div>
+                    <p style="font-size: clamp(0.78rem, 1.1vw, 0.95rem); line-height: 1.45; color: var(--text-secondary);">Build the next prompt from the new state. The behaviour changes because the state changed, not the model.</p>
+                </div>
+            </div>
+            <p class="reveal" style="max-width: 850px; margin-top: var(--content-gap); font-family: var(--font-display); font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--text-primary);">The model does one part of one step. The system does everything else.</p>
         </div>
     </section>
 
