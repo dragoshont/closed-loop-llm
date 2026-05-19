@@ -1010,15 +1010,15 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 9, AUTORESEARCH (canonical example)
+         SLIDE 9, AUTORESEARCH — canonical example + anchor line
+         (merged: was slides 9 + 10, joined for compaction)
     ========================================================== -->
     <section class="slide bg-grid">
         <span class="slide-num">07</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 4 · canonical example</div>
             <h2 class="reveal"><code style="font-size: 0.85em;">karpathy/autoresearch</code>: the loop in four files.</h2>
-            <p class="reveal" style="max-width: 800px; margin-top: var(--element-gap);">An AI agent runs research overnight on a single-GPU GPT training setup. ~100 experiments while you sleep.</p>
-            <div class="file-frame reveal">
+            <div class="file-frame reveal" style="margin-top: var(--element-gap);">
                 <div class="file-card">
                     <div class="file-name">program.md</div>
                     <div class="file-role">orchestration / skill</div>
@@ -1040,34 +1040,31 @@
                 <div class="file-card">
                     <div class="file-name">results.tsv</div>
                     <div class="file-role">memory / trace</div>
-                    <div class="file-desc">Every experiment, every metric. The agent reads its own history. Compounding context.</div>
+                    <div class="file-desc">Every experiment, every metric. The agent reads its own history.</div>
                     <div class="file-actor">→ next iteration uses this</div>
                 </div>
+            </div>
+            <div class="reveal" style="margin-top: var(--content-gap); text-align: center; width: 100%;">
+                <p style="font-family: var(--font-display); font-size: clamp(1rem, 2vw, 1.5rem); color: var(--text-primary); font-weight: 500; line-height: 1.4;">
+                    Human edits <code>program.md</code>. Agent edits <code>train.py</code>. <span style="color: var(--accent);">Neither edits the model.</span>
+                </p>
+                <p style="font-family: var(--font-mono); font-size: var(--small-size); color: var(--text-secondary); letter-spacing: 0.08em; margin-top: clamp(0.3rem, 0.8vw, 0.6rem);">
+                    // THIS IS NOT MODEL RETRAINING
+                </p>
             </div>
         </div>
     </section>
 
     <!-- ==========================================================
-         SLIDE 10, AUTORESEARCH ANCHOR LINE
+         SLIDE 10 merged into slide 9 in the compaction pass.
+         The autoresearch anchor line now closes slide 9 as a centered punchline.
     ========================================================== -->
-    <section class="slide line-slide mesh-bg bg-orbit">
-        <span class="slide-num">08</span>
-        <div class="slide-content">
-            <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
-            <div class="big-line reveal">
-                The human edits <code style="font-size: 0.95em;">program.md</code>.<br>
-                The agent edits <code style="font-size: 0.95em;">train.py</code>.<br>
-                <span class="accent-word">Neither edits the model.</span>
-            </div>
-            <div class="attribution reveal">// THIS IS NOT MODEL RETRAINING</div>
-        </div>
-    </section>
 
     <!-- ==========================================================
          SLIDE 11, OUR DEMO ARCHITECTURE
     ========================================================== -->
     <section class="slide bg-grid">
-        <span class="slide-num">09</span>
+        <span class="slide-num">08</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 5 · the demo</div>
             <h2 class="reveal">Same idea. Smaller scope. ~170 lines of Python.</h2>
@@ -1104,7 +1101,7 @@
          SLIDE 12, LIVE DEMO PLACEHOLDER
     ========================================================== -->
     <section class="slide demo-screen mesh-bg bg-orbit">
-        <span class="slide-num">10</span>
+        <span class="slide-num">09</span>
         <div class="slide-content">
             <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
             <div class="big-cue reveal">→ live demo</div>
@@ -1128,7 +1125,7 @@
          SLIDE 13, BEFORE / AFTER
     ========================================================== -->
     <section class="slide bg-grid">
-        <span class="slide-num">11</span>
+        <span class="slide-num">10</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 5 · what just happened</div>
             <h2 class="reveal">Same prompt. Same model. Same temperature.</h2>
@@ -1153,7 +1150,7 @@
          Density audit: 1 heading + 2 paragraphs + 1 callout note. Within limits.
     ========================================================== -->
     <section class="slide bg-grid">
-        <span class="slide-num">12</span>
+        <span class="slide-num">11</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 5 · be precise</div>
             <h2 class="reveal">This demo shows <em>adaptation</em>. Not <em>improvement</em>.</h2>
@@ -1167,7 +1164,7 @@
          SLIDE 15, FAILURE MODES
     ========================================================== -->
     <section class="slide bg-grid">
-        <span class="slide-num">13</span>
+        <span class="slide-num">12</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 6 · the dark side</div>
             <h2 class="reveal">When the loop hurts you.</h2>
@@ -1195,7 +1192,7 @@
          SLIDE 16, THE LINE: self-degradation
     ========================================================== -->
     <section class="slide line-slide mesh-bg bg-orbit">
-        <span class="slide-num">14</span>
+        <span class="slide-num">13</span>
         <div class="slide-content">
             <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
             <div class="big-line reveal">
@@ -1209,7 +1206,7 @@
          Density audit: 1 heading + 4 bullets (within 4–6 limit). Quote folded into final bullet.
     ========================================================== -->
     <section class="slide mesh-bg bg-lines">
-        <span class="slide-num">15</span>
+        <span class="slide-num">14</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 7 · where this lands</div>
             <h2 class="reveal">Most production AI systems improve<br>at the <span style="color: var(--accent);">orchestration layer</span>.</h2>
