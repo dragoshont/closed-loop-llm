@@ -1,0 +1,28 @@
+# Generated demo state — created by `demo.py reset`
+demo/memory.json
+
+# Demo fallback screenshots (not part of source)
+demo/fallback/
+
+# Private speaker materials — full transcripts and rehearsal notes stay private
+transcript*.md
+*transcript*.md
+speech*.md
+rehearsal*.md
+private/
+notes/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
