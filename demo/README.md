@@ -1,252 +1,29 @@
-# Self-improving system demo
+# demo/
 
-A tiny, transparent, runnable example of a closed-loop AI system that gets
-better without retraining the model. Built for the talk **"Designing
-Self-Improving Systems with LLMs."**
+The runnable closed-loop demo. **All setup, usage, troubleshooting, and
+configuration docs live in the [top-level README](../README.md).**
 
-```
-ask → evaluate → persist → adapt → ask
-```
-
-**What you'll see in 3 commands:**
-
-1. Ask a generic question → get a generic answer
-2. Give a piece of feedback → memory updates, evaluator extracts structured preferences
-3. Ask the same question again → different answer, same model
-
-No vector DB. No LangChain. No frameworks. No fine-tuning. Just JSON on disk
-and a structured prompt. That is the entire point.
-
----
-
-## The loop, in commands
-
-After the [setup](#setup-5-minutes), the entire demo is four commands:
-
-```text
-demo.py reset
-demo.py ask      "Suggest something fun for this weekend"
-demo.py feedback "I dislike outdoor activities and I'm on a tight budget"
-demo.py ask      "Suggest something fun for this weekend"
-```
-
-**Expected behavior shift** (wording will vary — temperature is `0.4`):
-
-| Step | Memory state | Sample response |
-|---|---|---|
-| Ask #1 | empty | "Consider trying an **outdoor adventure like hiking**..." |
-| Feedback | — | evaluator extracts `dislikes: outdoor activities`, `constraints: tight budget` |
-| Ask #2 | populated | "Consider exploring your local **library's digital resources** — **it's free** and can be done **from home**..." |
-
-That shift — same prompt in, different category of answer out, *because the
-memory changed and the prompt template re-rendered* — is the whole demo.
-
-> Run the commands using your platform's Python launcher (e.g. `python demo.py …`,
-> `python3 demo.py …`, or `py .\demo.py …` on Windows). The default model id
-> `phi-4-mini-instruct` matches the recommended setup below. If you load a
-> different model in LM Studio, set the `LMSTUDIO_MODEL` environment variable
-> to its id — see [Configuration](#configuration).
-
----
-
-## What's in here
+## Files
 
 | File | Role |
 |---|---|
 | `demo.py` | CLI — `ask` / `feedback` / `show` / `reset`. ~170 lines of stdlib Python. |
-| `prompts/planner.txt` | The system prompt that consumes `{memory_block}` and answers the user. |
-| `prompts/evaluator.txt` | The system prompt that extracts structured preferences from feedback. |
-| `memory.json` | The persistent state. **This is the thing that makes the system "improve."** |
-| `memory.baseline.json` | Empty state. `reset` copies this over `memory.json`. |
-| `reset.ps1` | One-line PowerShell helper for resetting memory between runs. |
+| `prompts/planner.txt` | System prompt that consumes `{memory_block}` and answers the user. |
+| `prompts/evaluator.txt` | System prompt that extracts structured preferences from feedback. |
+| `memory.baseline.json` | Empty state — `reset` copies this over `memory.json`. |
+| `memory.json` | The persistent state. Generated on first run, gitignored. |
+| `reset.ps1` | PowerShell helper for resetting memory between runs. |
 
----
-
-## Setup (5 minutes)
-
-### 1. Install LM Studio
-
-**LM Studio is free and available on macOS, Windows, and Linux.** Download the
-**current version** from [lmstudio.ai](https://lmstudio.ai). The website
-auto-detects your platform; the downloads page also lists every variant:
-
-- **macOS** (Apple Silicon **and** Intel) — `.dmg`, universal binary, drag to `/Applications`
-- **Windows x64** (Intel/AMD) — `.exe` installer
-- **Windows ARM64** (Snapdragon X) — `.exe` installer whose filename contains
-  `arm64`. The x64 build does **not** run natively under emulation.
-- **Linux x64** — `.AppImage`, `chmod +x` and run
-
-> ⚠️ **LM Studio ≤ 0.4.13 will not work.** The demo uses the `json_schema`
-> response format, which older builds don't support, and the Phi-4 chat
-> template needs a recent runtime. Upgrade if you have an older install.
-
-### 2. Pick a chat runtime
-
-Open **Settings → Runtime**. In the **GGUF** dropdown at the top, pick the
-runtime marked **compatible** with your hardware:
-
-| Platform | Hardware | Pick this runtime |
-|---|---|---|
-| **macOS** | Apple Silicon (M1/M2/M3/M4) | `Metal llama.cpp (macOS Apple Silicon)` |
-| **macOS** | Intel Mac | `CPU llama.cpp (macOS)` |
-| **Windows** | Snapdragon X / ARM64 | `CPU llama.cpp (Windows ARM)` |
-| **Windows** | Intel/AMD CPU, no GPU | `CPU llama.cpp (Windows)` |
-| **Windows** | NVIDIA GPU | `CUDA llama.cpp (Windows)` |
-| **Windows** | Other GPUs (Intel Arc, AMD Radeon) | `Vulkan llama.cpp (Windows)` |
-| **Linux** | NVIDIA GPU | `CUDA llama.cpp (Linux)` |
-| **Linux** | Other GPUs / CPU only | `Vulkan llama.cpp (Linux)` or `CPU llama.cpp (Linux)` |
-
-LM Studio marks the runtimes that match your machine with **"Latest version"**
-in green. Anything marked **"Non Compatible"** in red will fail — don't pick
-those even if they sound faster.
-
-> **Why this matters:** picking the wrong runtime is the #1 cause of broken
-> demos (degenerate output, "not a valid Win32 application" errors, missing
-> chat templates). The compatible runtime for your hardware is the only
-> correct answer.
-
-### 3. Download a model
-
-In LM Studio's **Discover** tab, search for and download:
-
-- **`Phi-4-mini-instruct`** (Q4_K_M) — ~2.5 GB, validated for this demo, Microsoft, fast.
-
-Alternatives that should also work:
-
-- `Llama-3.2-3B-Instruct` — Meta, very fast, well-tested
-- `Qwen2.5-3B-Instruct` — Alibaba, multilingual
-
-> Avoid **reasoning** variants (`phi-4-mini-reasoning`, `deepseek-r1-distill`,
-> etc.) — they emit long `<think>...</think>` blocks that blow past the demo's
-> latency budget.
-
-### 4. Start the local server
-
-In LM Studio's **Local Server** tab:
-
-1. Click **Load Model** → pick your downloaded model.
-2. Confirm **Reachable at: `http://127.0.0.1:1234`**.
-3. Toggle **Status** to **Running**.
-
-Sanity-check the server is up:
+## Quick reference
 
 ```text
-GET http://localhost:1234/v1/models
+python demo.py reset
+python demo.py ask      "Suggest something fun for this weekend"
+python demo.py feedback "I dislike outdoor activities and I'm on a tight budget"
+python demo.py ask      "Suggest something fun for this weekend"
+python demo.py show
 ```
 
-It should return JSON listing your loaded model.
-
-### 5. Python
-
-Python **3.10 or newer**. Stdlib only — no `pip install` needed.
-
----
-
-## Configuration
-
-All optional. Set as environment variables before running `demo.py`. The
-default `LMSTUDIO_MODEL` matches the recommended Phi-4-mini-instruct setup
-above; only change it if you loaded a different model.
-
-| Variable | Default | What it does |
-|---|---|---|
-| `LMSTUDIO_URL` | `http://localhost:1234/v1/chat/completions` | OpenAI-compatible endpoint |
-| `LMSTUDIO_MODEL` | `phi-4-mini-instruct` | Loaded model id — change if you use a different model |
-| `LMSTUDIO_TEMP` | `0.4` | Planner temperature. Evaluator is always `0`. |
-| `LMSTUDIO_MAX_TOKENS` | `256` | Caps response length — keeps demo snappy |
-| `LMSTUDIO_TIMEOUT` | `60` | Seconds before giving up on a slow model |
-
----
-
-## Troubleshooting
-
-| Symptom | Cause | Fix |
-|---|---|---|
-| `HTTP 400 ... Invalid model identifier` | Loaded model id doesn't match `LMSTUDIO_MODEL` | Either load `phi-4-mini-instruct` in LM Studio, or set `LMSTUDIO_MODEL` to the model you did load |
-| `HTTP 400 ... 'response_format.type' must be 'json_schema' or 'text'` | LM Studio version too old | Upgrade LM Studio |
-| Output is coherent at first, then degenerates into `/A/B/C/D/...` token salad | Wrong runtime for your hardware | Pick the runtime marked compatible — see runtime table |
-| `not a valid Win32 application` (Windows) | x64 runtime on ARM64 machine | Install the ARM64 LM Studio build |
-| `Could not reach LM Studio` / connection refused | Server isn't running | Toggle **Status → Running** in the Local Server tab |
-| `Model call timed out after 60s` | Reasoning model (`<think>` chains) | Switch to a non-reasoning model, or raise `LMSTUDIO_TIMEOUT` |
-| Evaluator returns empty arrays even for clear feedback | Model is too small (under 2B params) | Use a 3B+ instruct model |
-| First call after model load is slow | Cold-start warm-up | Pre-warm by running one `ask` before walking on stage |
-
----
-
-## How the loop actually works
-
-```
-                 ┌───────────────────────────┐
-                 │     memory.json           │
-                 │     (preferences, etc.)   │
-                 └──────────┬────────────────┘
-                            │
-              load          │           merge
-                            ▼
-   ┌──────────┐      ┌─────────────────┐      ┌─────────────────┐
-   │  user    │─────▶│  PLANNER PROMPT │─────▶│      MODEL      │─────▶ answer
-   │ question │      │ (template +     │      │  (LM Studio)    │
-   └──────────┘      │  memory_block)  │      └─────────────────┘
-                     └─────────────────┘
-                                                       ▲
-                                                       │
-   ┌──────────┐      ┌─────────────────┐      ┌─────────────────┐
-   │  user    │─────▶│ EVALUATOR PROMPT│─────▶│      MODEL      │─────▶ JSON
-   │ feedback │      │ (strict schema) │      │  (LM Studio)    │       (extracted prefs)
-   └──────────┘      └─────────────────┘      └─────────────────┘
-```
-
-The model never changes. The **prompt** changes — because the **memory** it
-embeds changes. That is "system-level learning" in the smallest possible form.
-
----
-
-## What to show the audience at each step
-
-1. **Ask #1** — point at `(empty — no preferences known yet)` in the
-   `LOAD MEMORY` step. The model is operating blind.
-2. **Feedback** — point at the extracted JSON. Say: *"the evaluator is just
-   another LLM call, but its output is constrained by a JSON schema."*
-3. **`show` the memory file** — the audience needs to see the literal file on disk.
-4. **Ask #2** — point at the `LOAD MEMORY` block now showing the dislikes and
-   constraints, then at the response. *"Same prompt. Same model. Same
-   temperature. Different behavior."*
-
-That's the talk's central claim, made provable in 30 seconds.
-
----
-
-## On-stage discipline
-
-- **Pre-load the model and pre-warm it** before walking on stage. Cold start
-  on first inference is 5–15s on CPU runtimes.
-- **Run `demo.py reset`** between rehearsals so the state is reproducible.
-- **Use a large terminal font** (18pt+). The JSON in the output is the slide.
-- **Don't read the JSON aloud line by line.** Point at the `dislikes` array
-  with the cursor. Let the audience read.
-- **Have screenshots as fallback.** See [`../demo_recovery_plan.md`](../demo_recovery_plan.md).
-  Capture a clean run into `fallback/` before the talk — switch to images
-  without apologizing if anything misbehaves.
-
----
-
-## Hacking on it
-
-Things to change to explore the architecture:
-
-- **The evaluator prompt** (`prompts/evaluator.txt`) — try extracting different
-  fields. The JSON schema in `demo.py` must match.
-- **The planner prompt** (`prompts/planner.txt`) — try a different domain
-  (meal planner, code reviewer, support agent). The loop stays identical.
-- **The merge logic** (`merge_extraction` in `demo.py`) — currently union-only.
-  Add forgetting, conflict resolution, or recency weighting and watch behavior
-  shift over many turns.
-- **The model** — swap to a smaller/larger instruct model and observe how
-  evaluator JSON quality changes. This is the talk's "evaluators are
-  load-bearing" point made tangible.
-
----
-
-## License
-
-Demo code is unlicensed (treat as MIT) — copy, fork, present, modify.
+See the [top-level README](../README.md) for install, platform-specific runtime
+selection, the model recommendation, environment variables, troubleshooting,
+and the architecture diagram.
