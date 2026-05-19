@@ -899,8 +899,7 @@
         <div class="slide-content">
             <div class="section-tag reveal">§ 1 · the gap</div>
             <h2 class="reveal" style="max-width: 950px;">Most LLM usage today is fundamentally <em>stateless</em>.</h2>
-            <p class="reveal" style="max-width: 750px; margin-top: var(--element-gap);">We prompt. We get an answer. And all learning dies at the end of the interaction.</p>
-            <p class="reveal" style="max-width: 750px;">The model doesn't remember you. The system doesn't remember anything you said yesterday. And tomorrow it'll make the same mistake again.</p>
+            <p class="reveal" style="max-width: 750px; margin-top: var(--element-gap);">We prompt. The model answers. The learning dies at the end of the interaction. Tomorrow, the same input gives the same answer.</p>
         </div>
     </section>
 
@@ -1133,12 +1132,12 @@
                 <div class="compare-col before">
                     <div class="label">Ask #1 · empty memory</div>
                     <div class="memory-state">(no preferences known yet)</div>
-                    <div class="response">"Consider trying an <em>outdoor adventure like hiking</em> in your local nature reserve. Fresh air, exercise, perfect for the weekend."</div>
+                    <div class="response">"Consider trying an <em>outdoor adventure like hiking</em> at your local state park or exploring nature trails. Fresh air, beautiful scenery, staying active."</div>
                 </div>
                 <div class="compare-col after">
                     <div class="label">Ask #2 · after feedback</div>
                     <div class="memory-state">dislikes: outdoor activities<br>constraints: tight budget</div>
-                    <div class="response">"Consider exploring your local <em>library's digital resources</em> or joining an <em>online course</em>. <em>It's free</em>, and can be done <em>from home</em>."</div>
+                    <div class="response">"Consider visiting your local <em>library's free events section</em> or exploring an <em>online virtual museum tour</em>. Culture and learning, <em>without spending money</em>."</div>
                 </div>
             </div>
             <p class="reveal" style="text-align: center; margin-top: var(--content-gap); max-width: 800px; margin-left: auto; margin-right: auto;">The prompt template re-rendered because <code>memory.json</code> mutated. That's it. That's the loop.</p>
@@ -1161,10 +1160,44 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 15, FAILURE MODES
+         SLIDE 15, PRODUCTION PATTERNS
+         New slide added 2026-05-19: grounds the abstraction with three
+         concrete production examples that already ship this pattern.
     ========================================================== -->
     <section class="slide bg-grid">
         <span class="slide-num">12</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 6 · in production today</div>
+            <h2 class="reveal">You've seen this pattern. You may have shipped it.</h2>
+            <div class="grid-4" style="grid-template-columns: repeat(3, 1fr); margin-top: var(--content-gap);">
+                <div class="comp-card reveal-scale" style="transition-delay: 0.1s;">
+                    <div class="icon">CURSOR</div>
+                    <h3><code style="font-size: 0.85em;">.cursor/rules</code></h3>
+                    <p>Per-repo rules files. Persistent across sessions. Tightened over weeks by user edits.</p>
+                    <p style="margin-top: clamp(0.3rem, 0.7vh, 0.5rem); color: var(--accent-secondary); font-size: var(--small-size);">Memory at the codebase level.</p>
+                </div>
+                <div class="comp-card reveal-scale" style="transition-delay: 0.2s;">
+                    <div class="icon">GITHUB COPILOT</div>
+                    <h3><code style="font-size: 0.78em;">.github/copilot-instructions.md</code></h3>
+                    <p>Team-shared instructions. Loaded into every Copilot session. Compounds across the team's commits.</p>
+                    <p style="margin-top: clamp(0.3rem, 0.7vh, 0.5rem); color: var(--accent-secondary); font-size: var(--small-size);">Memory at the team level.</p>
+                </div>
+                <div class="comp-card reveal-scale" style="transition-delay: 0.3s;">
+                    <div class="icon">ANTHROPIC</div>
+                    <h3>Harness pattern</h3>
+                    <p>Long-running agents with persistent task state and separate evaluator agents. Published in their 2026 harness essay.</p>
+                    <p style="margin-top: clamp(0.3rem, 0.7vh, 0.5rem); color: var(--accent-secondary); font-size: var(--small-size);">Memory at the task level.</p>
+                </div>
+            </div>
+            <p class="reveal" style="text-align: center; margin-top: var(--content-gap); max-width: 800px; margin-left: auto; margin-right: auto; font-family: var(--font-display); font-size: clamp(1rem, 1.8vw, 1.3rem);">Same loop. Different scopes. <span style="color: var(--accent);">The pattern is already shipping.</span></p>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 15, FAILURE MODES
+    ========================================================== -->
+    <section class="slide bg-grid">
+        <span class="slide-num">13</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 6 · the dark side</div>
             <h2 class="reveal">When the loop hurts you.</h2>
@@ -1192,7 +1225,7 @@
          SLIDE 16, THE LINE: self-degradation
     ========================================================== -->
     <section class="slide line-slide mesh-bg bg-orbit">
-        <span class="slide-num">13</span>
+        <span class="slide-num">14</span>
         <div class="slide-content">
             <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
             <div class="big-line reveal">
@@ -1206,7 +1239,7 @@
          Density audit: 1 heading + 4 bullets (within 4–6 limit). Quote folded into final bullet.
     ========================================================== -->
     <section class="slide mesh-bg bg-lines">
-        <span class="slide-num">14</span>
+        <span class="slide-num">15</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 7 · where this lands</div>
             <h2 class="reveal">Most production AI systems improve<br>at the <span style="color: var(--accent);">orchestration layer</span>.</h2>
