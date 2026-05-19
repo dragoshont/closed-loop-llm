@@ -30,7 +30,8 @@ demo.py ask      "Suggest something fun for this weekend"
 That shift — same prompt in, different category of answer out, *because the
 memory changed and the prompt template re-rendered* — is the whole demo.
 No vector DB. No LangChain. No frameworks. No fine-tuning. ~170 lines of
-stdlib Python and two prompt files.
+stdlib Python and two prompt files. **Runs entirely on your laptop — local
+open-source model via LM Studio, no cloud calls, no API keys.**
 
 > Run the commands using your platform's Python launcher (e.g. `python demo.py …`,
 > `python3 demo.py …`, or `py .\demo.py …` on Windows) from inside the `demo/`
@@ -82,14 +83,8 @@ This demo is the smallest possible artifact of that second clause.
 │   │   └── evaluator.txt        ← system prompt that returns strict JSON
 │   ├── memory.baseline.json     ← reset target (empty state)
 │   └── reset.ps1                ← PowerShell helper for resetting memory
-├── slides/                      ← talk slide deck (open index.html in any browser)
-│   └── index.html               ← self-contained HTML, no dependencies
-└── talk/                        ← talk content (read-only, not needed to run)
-    ├── agenda.md                ← 25-min talk + 5-min Q&A timing plan
-    ├── core_thesis.md
-    ├── audience_takeaways.md
-    ├── objections_and_answers.md
-    └── demo_script.md
+└── slides/                      ← talk slide deck (open index.html in any browser)
+    └── index.html               ← self-contained HTML, no dependencies
 ```
 
 ---
@@ -280,11 +275,9 @@ component**. This repo exists to make the *adaptation* half of that claim
 runnable on your laptop in under five minutes. The *improvement* half lives
 one layer up — see ["What this demo shows (and what it deliberately doesn't)"](#what-this-demo-shows-and-what-it-deliberately-doesnt).
 
-For the full argument see [`talk/core_thesis.md`](./talk/core_thesis.md) and
-[`talk/audience_takeaways.md`](./talk/audience_takeaways.md). For pre-emptive
-answers to the usual skeptics' questions ("isn't this just RAG?", "isn't this
-just chat history?"), see [`talk/objections_and_answers.md`](./talk/objections_and_answers.md).
-For the on-stage choreography see [`talk/demo_script.md`](./talk/demo_script.md).
+For the talk's underlying argument, this repo is the runnable companion. The
+full written thesis, audience takeaways, objection handling, and stage script
+live separately (not in this repo).
 
 ---
 
