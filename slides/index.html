@@ -75,19 +75,29 @@
             scroll-snap-align: start;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
             position: relative;
         }
 
+        /* 16:9 inner stage. Each slide fills the viewport, but the actual
+           content area is locked to a 16:9 box centered inside it. If the
+           browser/projector isn't 16:9, the surrounding area letterboxes
+           (top/bottom or left/right) with the slide's own background.
+           This keeps layouts identical across projectors, regardless of
+           the host display's true ratio. */
         .slide-content {
-            flex: 1;
+            flex: none;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
-            max-height: 100%;
-            max-width: 1300px;
+            aspect-ratio: 16 / 9;
+            width: min(100vw, calc(100vh * 16 / 9));
+            height: min(100vh, calc(100vw * 9 / 16));
+            max-width: 1600px;
+            max-height: 900px;
             margin: 0 auto;
-            width: 100%;
             overflow: hidden;
             padding: var(--slide-padding);
             position: relative;
