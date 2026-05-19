@@ -6,16 +6,16 @@
     <title>Designing Self-Improving Systems with LLMs</title>
 
     <!-- Fonts: Syne (bold display) + General Sans (body) + Fira Code (mono).
-         Matched to Mihai's "Harness Engineering 101" deck so the paired talks
-         share a visual identity — the audience reads it as one cohesive hour. -->
+         Visual identity shared with the paired talk that follows, so the audience
+         reads both decks as one cohesive hour. -->
     <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=syne@400,500,600,700,800&f[]=general-sans@300,400,500,600,700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap">
 
     <style>
         /* ===========================================
-           THEME — Dev Social palette, matched to Mihai's "Harness Engineering 101"
-           Deep navy-purple + magenta + cyan. Same colors as Mihai's deck so the paired
-           talks share a visual identity.
+           THEME, Dev Social palette, shared with the paired talk that follows.
+           Deep navy-purple + magenta + cyan. Same colors as the next deck so
+           the two together read as one cohesive hour.
            Contrast ratios vs #0e0c2a background:
              --text-primary (#f0f0f8):    15.2:1  AAA
              --text-secondary (#b8b4d4):   7.8:1  AAA
@@ -117,7 +117,7 @@
         }
 
         /* ===========================================
-           VIEWPORT FALLBACKS — short screens
+           VIEWPORT FALLBACKS, short screens
         =========================================== */
         @media (max-height: 800px) {
             :root {
@@ -272,7 +272,7 @@
         .slide.visible .reveal-scale { opacity: 1; transform: scale(1); }
 
         /* ===========================================
-           INLINE EDITING — opt-in, off by default
+           INLINE EDITING, opt-in, off by default
            Press E or hover the top-left 80x80 hotzone to reveal the toggle.
            Edits autosave to localStorage. Useful for last-minute on-stage fixes.
         =========================================== */
@@ -385,7 +385,7 @@
         }
 
         /* ===========================================
-           LINE SLIDE — single memorable line, centered
+           LINE SLIDE, single memorable line, centered
         =========================================== */
         .line-slide .slide-content {
             justify-content: center;
@@ -789,7 +789,7 @@
             transform: scale(1.4);
         }
 
-        /* Demo screen — full-bleed terminal */
+        /* Demo screen, full-bleed terminal */
         .demo-screen .slide-content {
             justify-content: center;
             align-items: center;
@@ -875,12 +875,12 @@
     <div class="progress-bar" id="progressBar"></div>
     <nav class="nav-dots" id="navDots"></nav>
 
-    <!-- Inline editing controls — invisible hotzone top-left, button appears on hover/E key -->
+    <!-- Inline editing controls, invisible hotzone top-left, button appears on hover/E key -->
     <div class="edit-hotzone" id="editHotzone" title="Hover or press E to edit"></div>
     <button class="edit-toggle" id="editToggle" title="Edit mode (E)">Edit</button>
 
     <!-- ==========================================================
-         SLIDE 1 — TITLE
+         SLIDE 1, TITLE
     ========================================================== -->
     <section class="slide title-slide mesh-bg bg-orbit">
         <div class="slide-content">
@@ -892,7 +892,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 2 — OPENING HOOK
+         SLIDE 2, OPENING HOOK
     ========================================================== -->
     <section class="slide mesh-bg bg-orbit">
         <span class="slide-num">01</span>
@@ -905,7 +905,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 3 — THE SHIFT
+         SLIDE 3, THE SHIFT
     ========================================================== -->
     <section class="slide mesh-bg bg-lines">
         <span class="slide-num">02</span>
@@ -913,13 +913,13 @@
             <div class="section-tag reveal">§ 1 · the shift</div>
             <h2 class="reveal">The real shift isn't to <em>better prompts</em>.<br>It's not to <em>bigger models</em>.</h2>
             <h2 class="reveal" style="margin-top: var(--element-gap); color: var(--accent);">It's to better systems.</h2>
-            <p class="reveal" style="max-width: 800px; margin-top: var(--content-gap);">Systems where LLMs operate inside <strong>closed loops</strong>, produce <strong>persistent artifacts</strong>, evaluate their own outputs, and get better over time — without anyone retraining anything.</p>
-            <p class="reveal" style="max-width: 800px;">Familiar engineering principles — state, evaluation, iteration, observability — applied to a new kind of system.</p>
+            <p class="reveal" style="max-width: 800px; margin-top: var(--content-gap);">Systems where LLMs operate inside <strong>closed loops</strong>, produce <strong>persistent artifacts</strong>, evaluate their own outputs, and get better over time, without anyone retraining anything.</p>
+            <p class="reveal" style="max-width: 800px;">Familiar engineering principles, state, evaluation, iteration, observability, applied to a new kind of system.</p>
         </div>
     </section>
 
     <!-- ==========================================================
-         SLIDE 4 — THE LINE: least interesting component
+         SLIDE 4, THE LINE: least interesting component
     ========================================================== -->
     <section class="slide line-slide mesh-bg bg-orbit">
         <span class="slide-num">03</span>
@@ -933,7 +933,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 5 — THE LOOP
+         SLIDE 5, THE LOOP
     ========================================================== -->
     <section class="slide bg-grid">
         <span class="slide-num">04</span>
@@ -950,12 +950,12 @@
                 <div class="loop-node active">adapt</div>
                 <span class="loop-arrow">↻</span>
             </div>
-            <p class="reveal" style="max-width: 800px; margin-top: var(--content-gap);">The model does one part of one step. The system does everything else.<br>That "everything else" is where the engineering lives — and where improvement compounds.</p>
+            <p class="reveal" style="max-width: 800px; margin-top: var(--content-gap);">The model does one part of one step. The system does everything else.<br>That "everything else" is where the engineering lives, and where improvement compounds.</p>
         </div>
     </section>
 
     <!-- ==========================================================
-         SLIDE 6 — COMPONENTS OF THE LOOP
+         SLIDE 6, COMPONENTS OF THE LOOP
     ========================================================== -->
     <section class="slide bg-grid">
         <span class="slide-num">05</span>
@@ -966,12 +966,12 @@
                 <div class="comp-card reveal-scale" style="transition-delay: 0.1s;">
                     <div class="icon">01 · EVALUATORS</div>
                     <h3>Turn outputs into signals.</h3>
-                    <p>Programmatic judges — sometimes deterministic, sometimes LLM-based — that convert unstructured outputs into structured pass/fail, scores, or extracted facts.</p>
+                    <p>Programmatic judges, sometimes deterministic, sometimes LLM-based, that convert unstructured outputs into structured pass/fail, scores, or extracted facts.</p>
                 </div>
                 <div class="comp-card reveal-scale" style="transition-delay: 0.18s;">
                     <div class="icon">02 · MEMORY</div>
                     <h3>State outlives the request.</h3>
-                    <p>Persistent storage — JSON on disk in the smallest version, a database in production — that survives the call and shapes the next one.</p>
+                    <p>Persistent storage, JSON on disk in the smallest version, a database in production, that survives the call and shapes the next one.</p>
                 </div>
                 <div class="comp-card reveal-scale" style="transition-delay: 0.26s;">
                     <div class="icon">03 · TELEMETRY</div>
@@ -981,14 +981,14 @@
                 <div class="comp-card reveal-scale" style="transition-delay: 0.34s;">
                     <div class="icon">04 · RUNTIME ADAPTATION</div>
                     <h3>The prompt changes.</h3>
-                    <p>Because the memory changed. No gradients. No retraining. The next prompt is mechanically different — and the audience can inspect why.</p>
+                    <p>Because the memory changed. No gradients. No retraining. The next prompt is mechanically different, and the audience can inspect why.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- ==========================================================
-         SLIDE 7 — RETRIEVAL VS ADAPTATION
+         SLIDE 7, RETRIEVAL VS ADAPTATION
     ========================================================== -->
     <section class="slide mesh-bg bg-lines">
         <span class="slide-num">06</span>
@@ -1021,7 +1021,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 8 — THE LINE: retrieval vs adaptation
+         SLIDE 8, THE LINE: retrieval vs adaptation
     ========================================================== -->
     <section class="slide line-slide mesh-bg bg-orbit">
         <span class="slide-num">07</span>
@@ -1035,13 +1035,13 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 9 — AUTORESEARCH (canonical example)
+         SLIDE 9, AUTORESEARCH (canonical example)
     ========================================================== -->
     <section class="slide bg-grid">
         <span class="slide-num">08</span>
         <div class="slide-content">
             <div class="section-tag reveal">§ 4 · canonical example</div>
-            <h2 class="reveal"><code style="font-size: 0.85em;">karpathy/autoresearch</code> — the loop, in four files.</h2>
+            <h2 class="reveal"><code style="font-size: 0.85em;">karpathy/autoresearch</code>, the loop, in four files.</h2>
             <p class="reveal" style="max-width: 800px; margin-top: var(--element-gap);">An AI agent runs research overnight on a single-GPU GPT training setup. ~100 experiments while you sleep.</p>
             <div class="file-frame reveal">
                 <div class="file-card">
@@ -1053,13 +1053,13 @@
                 <div class="file-card">
                     <div class="file-name">train.py</div>
                     <div class="file-role">behavioral adaptation</div>
-                    <div class="file-desc">The full GPT model + optimizer + loop. Architecture, hyperparams — all fair game.</div>
+                    <div class="file-desc">The full GPT model + optimizer + loop. Architecture, hyperparams, all fair game.</div>
                     <div class="file-actor">→ agent edits this</div>
                 </div>
                 <div class="file-card">
                     <div class="file-name">5-min budget + val_bpb</div>
                     <div class="file-role">evaluator</div>
-                    <div class="file-desc">Fixed wall-clock budget per experiment. One scalar metric — lower is better. Deterministic.</div>
+                    <div class="file-desc">Fixed wall-clock budget per experiment. One scalar metric, lower is better. Deterministic.</div>
                     <div class="file-actor">→ keep or discard</div>
                 </div>
                 <div class="file-card">
@@ -1073,7 +1073,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 10 — AUTORESEARCH ANCHOR LINE
+         SLIDE 10, AUTORESEARCH ANCHOR LINE
     ========================================================== -->
     <section class="slide line-slide mesh-bg bg-orbit">
         <span class="slide-num">09</span>
@@ -1089,7 +1089,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 11 — OUR DEMO ARCHITECTURE
+         SLIDE 11, OUR DEMO ARCHITECTURE
     ========================================================== -->
     <section class="slide bg-grid">
         <span class="slide-num">10</span>
@@ -1126,7 +1126,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 12 — LIVE DEMO PLACEHOLDER
+         SLIDE 12, LIVE DEMO PLACEHOLDER
     ========================================================== -->
     <section class="slide demo-screen mesh-bg bg-orbit">
         <span class="slide-num">11</span>
@@ -1150,7 +1150,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 13 — BEFORE / AFTER
+         SLIDE 13, BEFORE / AFTER
     ========================================================== -->
     <section class="slide bg-grid">
         <span class="slide-num">12</span>
@@ -1159,14 +1159,14 @@
             <h2 class="reveal">Same prompt. Same model. Same temperature.</h2>
             <div class="compare reveal">
                 <div class="compare-col before">
-                    <div class="label">Ask #1 — empty memory</div>
+                    <div class="label">Ask #1, empty memory</div>
                     <div class="memory-state">(no preferences known yet)</div>
-                    <div class="response">"Consider trying an <em>outdoor adventure like hiking</em> in your local nature reserve — fresh air, exercise, perfect for the weekend."</div>
+                    <div class="response">"Consider trying an <em>outdoor adventure like hiking</em> in your local nature reserve, fresh air, exercise, perfect for the weekend."</div>
                 </div>
                 <div class="compare-col after">
-                    <div class="label">Ask #2 — after feedback</div>
+                    <div class="label">Ask #2, after feedback</div>
                     <div class="memory-state">dislikes: outdoor activities<br>constraints: tight budget</div>
-                    <div class="response">"Consider exploring your local <em>library's digital resources</em> or joining an <em>online course</em> — <em>it's free</em> and can be done <em>from home</em>."</div>
+                    <div class="response">"Consider exploring your local <em>library's digital resources</em> or joining an <em>online course</em>, <em>it's free</em> and can be done <em>from home</em>."</div>
                 </div>
             </div>
             <p class="reveal" style="text-align: center; margin-top: var(--content-gap); max-width: 800px; margin-left: auto; margin-right: auto;">The prompt template re-rendered because <code>memory.json</code> mutated. That's it. That's the loop.</p>
@@ -1174,7 +1174,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 14 — HONEST FRAMING: adaptation vs improvement
+         SLIDE 14, HONEST FRAMING: adaptation vs improvement
          Density audit: 1 heading + 2 paragraphs + 1 callout note. Within limits.
     ========================================================== -->
     <section class="slide bg-grid">
@@ -1189,7 +1189,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 15 — FAILURE MODES
+         SLIDE 15, FAILURE MODES
     ========================================================== -->
     <section class="slide bg-grid">
         <span class="slide-num">14</span>
@@ -1216,7 +1216,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 16 — THE LINE: self-degradation
+         SLIDE 16, THE LINE: self-degradation
     ========================================================== -->
     <section class="slide line-slide mesh-bg bg-orbit">
         <span class="slide-num">15</span>
@@ -1229,7 +1229,7 @@
     </section>
 
     <!-- ==========================================================
-         SLIDE 17 — WHERE THE LEVERAGE IS (closing)
+         SLIDE 17, WHERE THE LEVERAGE IS (closing)
          Density audit: 1 heading + 4 bullets (within 4–6 limit). Quote folded into final bullet.
     ========================================================== -->
     <section class="slide mesh-bg bg-lines">
@@ -1241,20 +1241,20 @@
                 <li class="reveal">Persistent skills accumulate. Reusable workflows compound.</li>
                 <li class="reveal">Eval-driven prompt iteration replaces ad-hoc prompt engineering.</li>
                 <li class="reveal">Execution traces become the dataset for the next round of iteration.</li>
-                <li class="reveal">The interesting question is no longer <em>“which model?”</em> — it's <em>“do we have the right loop?”</em></li>
+                <li class="reveal">The interesting question is no longer <em>“which model?”</em>, it's <em>“do we have the right loop?”</em></li>
             </ul>
         </div>
     </section>
 
     <!-- ==========================================================
-         SLIDE 18 — HANDOFF / THANKS
+         SLIDE 18, HANDOFF / THANKS
     ========================================================== -->
     <section class="slide title-slide mesh-bg">
         <div class="slide-content" style="align-items: center; text-align: center;">
             <div class="accent-line reveal" style="margin: 0 auto;"></div>
             <h1 class="reveal" style="font-size: clamp(1.8rem, 5vw, 4rem);">Thank you.</h1>
             <p class="subtitle reveal" style="max-width: 800px;">The model is the least interesting component.<br>The interesting work is the system around it.</p>
-            <p class="reveal" style="max-width: 750px; color: var(--text-secondary); margin-top: var(--element-gap); font-style: italic;">Mihai is about to take you deeper into exactly that — the harness, the engineering discipline. Hand off.</p>
+            <p class="reveal" style="max-width: 750px; color: var(--text-secondary); margin-top: var(--element-gap); font-style: italic;">The next talk takes you deeper into exactly that, the harness, the engineering discipline. Hand off.</p>
 
             <div class="reveal" style="margin-top: var(--content-gap); display: flex; flex-direction: column; gap: 0.6rem; align-items: center;">
                 <a href="https://aka.ms/cll-demo" target="_blank" class="cta-link" style="letter-spacing: 0.08em;">AKA.MS/CLL-DEMO</a>
@@ -1333,7 +1333,7 @@
 
 
     /* ==========================================================
-       INLINE EDITOR — opt-in, off by default
+       INLINE EDITOR, opt-in, off by default
        Press E or hover the top-left corner. Edits autosave
        to localStorage on toggle-off or Ctrl+S.
     ========================================================== */
@@ -1397,7 +1397,7 @@
             }
         });
 
-        // loadSaved();  // disabled by default — opt-in if you want to persist edits across sessions
+        // loadSaved();  // disabled by default, opt-in if you want to persist edits across sessions
     })();
         // Initial reveal
         slides[0].classList.add('visible');

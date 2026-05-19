@@ -7,10 +7,10 @@ configuration docs live in the [top-level README](../README.md).**
 
 | File | Role |
 |---|---|
-| `demo.py` | CLI — `ask` / `feedback` / `show` / `reset`. ~170 lines of stdlib Python. |
+| `demo.py` | CLI, `ask` / `feedback` / `show` / `reset`. ~170 lines of stdlib Python. |
 | `prompts/planner.txt` | System prompt that consumes `{memory_block}` and answers the user. |
 | `prompts/evaluator.txt` | System prompt that extracts structured preferences from feedback. |
-| `memory.baseline.json` | Empty state — `reset` copies this over `memory.json`. |
+| `memory.baseline.json` | Empty state, `reset` copies this over `memory.json`. |
 | `memory.json` | The persistent state. Generated on first run, gitignored. |
 | `reset.ps1` | PowerShell helper for resetting memory between runs. |
 
