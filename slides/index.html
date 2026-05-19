@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designing Self-Improving Systems with LLMs</title>
+
+    <!-- Fonts: Syne (bold display) + General Sans (body) + Fira Code (mono).
+         Matched to Mihai's "Harness Engineering 101" deck so the paired talks
+         share a visual identity — the audience reads it as one cohesive hour. -->
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=syne@400,500,600,700,800&f[]=general-sans@300,400,500,600,700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap">
+
+    <style>
+        /* ===========================================
+           THEME — Dev Social palette, matched to Mihai's "Harness Engineering 101"
+           Deep navy-purple + magenta + cyan. Same colors as Mihai's deck so the paired
+           talks share a visual identity.
+           Contrast ratios vs #0e0c2a background:
+             --text-primary (#f0f0f8):    15.2:1  AAA
+             --text-secondary (#b8b4d4):   7.8:1  AAA
+             --accent (#e91e8c):           4.7:1  AA
+             --accent-secondary (#2dd4bf): 8.9:1  AAA
+        =========================================== */
+        :root {
+            --bg-primary: #0e0c2a;
+            --bg-secondary: #16133a;
+            --bg-card: rgba(22, 19, 58, 0.8);
+            --text-primary: #f0f0f8;
+            --text-secondary: #b8b4d4;
+            --accent: #e91e8c;
+            --accent-secondary: #2dd4bf;
+            --accent-dim: #c4187a;
+            --accent-glow: rgba(233, 30, 140, 0.15);
+            --accent-secondary-glow: rgba(45, 212, 191, 0.12);
+            --noise-opacity: 0.02;
+            --border-subtle: rgba(233, 30, 140, 0.18);
+
+            --font-display: 'Syne', system-ui, sans-serif;
+            --font-body: 'General Sans', system-ui, sans-serif;
+            --font-mono: 'Fira Code', monospace;
+
+            --title-size: clamp(2rem, 6vw, 4.75rem);
+            --h2-size: clamp(1.55rem, 3.8vw, 3.25rem);
+            --h3-size: clamp(1.05rem, 2.3vw, 1.65rem);
+            --body-size: clamp(0.95rem, 1.5vw, 1.35rem);
+            --small-size: clamp(0.78rem, 1.1vw, 1rem);
+            --mono-size: clamp(0.78rem, 1.15vw, 1rem);
+
+            --slide-padding: clamp(1.5rem, 5vw, 5rem);
+            --content-gap: clamp(1rem, 2.4vw, 2.5rem);
+            --element-gap: clamp(0.3rem, 1.1vw, 1.1rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.7s;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            max-height: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+            position: relative;
+            z-index: 1;
+        }
+
+        h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.1; letter-spacing: -0.01em; }
+        h1 { font-size: var(--title-size); }
+        h2 { font-size: var(--h2-size); }
+        h3 { font-size: var(--h3-size); }
+        p, li { font-size: var(--body-size); line-height: 1.6; color: var(--text-secondary); }
+        em { font-style: italic; color: var(--text-primary); }
+        strong { color: var(--text-primary); font-weight: 600; }
+
+        code, .mono {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            background: rgba(233, 30, 140, 0.10);
+            padding: 0.15em 0.4em;
+            border-radius: 4px;
+            color: var(--accent);
+        }
+
+        *:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        /* ===========================================
+           VIEWPORT FALLBACKS — short screens
+        =========================================== */
+        @media (max-height: 800px) {
+            :root {
+                --slide-padding: clamp(1rem, 4vw, 3rem);
+                --content-gap: clamp(0.6rem, 1.8vw, 1.5rem);
+                --body-size: clamp(0.85rem, 1.4vw, 1.1rem);
+                --h2-size: clamp(1.4rem, 3.4vw, 2.6rem);
+            }
+        }
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1rem, 3vw, 1.75rem);
+                --body-size: clamp(0.8rem, 1.3vw, 1rem);
+            }
+        }
+        @media (max-height: 600px) {
+            .nav-dots, .keyboard-hint, .decorative { display: none; }
+        }
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           PRINT / PDF LANDSCAPE
+        =========================================== */
+        html, body, .slide,
+        .mesh-bg, .mesh-bg::after,
+        .bg-grid, .bg-orbit, .bg-lines {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+        }
+
+        @page { size: landscape; margin: 0; }
+        @media print {
+            html { scroll-snap-type: none; scroll-behavior: auto; overflow: visible; height: auto; }
+            body {
+                background: var(--bg-primary) !important;
+                overflow: visible;
+                height: auto;
+            }
+            .slide {
+                width: 100vw;
+                height: 100vh;
+                overflow: hidden;
+                page-break-after: always;
+                page-break-inside: avoid;
+                break-after: page;
+                break-inside: avoid;
+                background-color: var(--bg-primary) !important;
+            }
+            .slide:last-child { page-break-after: auto; break-after: auto; }
+            .slide::before { display: none; }
+            .progress-bar, .nav-dots { display: none !important; }
+            .reveal, .reveal-scale { opacity: 1 !important; transform: none !important; transition: none !important; }
+        }
+
+        /* ===========================================
+           NOISE TEXTURE
+        =========================================== */
+        .slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+            opacity: var(--noise-opacity);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===========================================
+           AMBIENT GLOWS / DECORATIVE BG
+        =========================================== */
+        .mesh-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 85%, var(--accent-glow) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 15%, var(--accent-secondary-glow) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Subtle grid - architecture/diagram slides */
+        .bg-grid {
+            background-image:
+                linear-gradient(rgba(233, 30, 140, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(233, 30, 140, 0.05) 1px, transparent 1px);
+            background-size: clamp(40px, 5vw, 70px) clamp(40px, 5vw, 70px);
+            background-color: var(--bg-primary);
+        }
+
+        /* Concentric arc - title/line slides */
+        .bg-orbit {
+            background-image:
+                radial-gradient(circle at 80% 50%, transparent 15%, rgba(233, 30, 140, 0.12) 15.5%, transparent 16%),
+                radial-gradient(circle at 80% 50%, transparent 22%, rgba(45, 212, 191, 0.07) 22.5%, transparent 23%);
+            background-color: var(--bg-primary);
+        }
+
+        /* Hairlines - section dividers */
+        .bg-lines {
+            background-image:
+                linear-gradient(90deg, transparent 0%, rgba(45, 212, 191, 0.22) 15%, rgba(45, 212, 191, 0.22) 35%, transparent 50%),
+                linear-gradient(90deg, transparent 50%, rgba(233, 30, 140, 0.20) 65%, rgba(233, 30, 140, 0.20) 85%, transparent 100%);
+            background-size: 100% 1.5px, 100% 1.5px;
+            background-position: 0 7%, 0 93%;
+            background-repeat: no-repeat, no-repeat;
+            background-color: var(--bg-primary);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bg-grid, .bg-orbit, .bg-lines { background-image: none; }
+        }
+
+        /* ===========================================
+           REVEAL ANIMATIONS
+        =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(25px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .slide.visible .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .slide.visible .reveal:nth-child(2) { transition-delay: 0.15s; }
+        .slide.visible .reveal:nth-child(3) { transition-delay: 0.25s; }
+        .slide.visible .reveal:nth-child(4) { transition-delay: 0.35s; }
+        .slide.visible .reveal:nth-child(5) { transition-delay: 0.45s; }
+        .slide.visible .reveal:nth-child(6) { transition-delay: 0.55s; }
+        .slide.visible .reveal:nth-child(7) { transition-delay: 0.65s; }
+        .slide.visible .reveal:nth-child(8) { transition-delay: 0.75s; }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.94);
+            transition: opacity 0.6s, transform 0.6s var(--ease-out-expo);
+        }
+        .slide.visible .reveal-scale { opacity: 1; transform: scale(1); }
+
+        /* ===========================================
+           INLINE EDITING — opt-in, off by default
+           Press E or hover the top-left 80x80 hotzone to reveal the toggle.
+           Edits autosave to localStorage. Useful for last-minute on-stage fixes.
+        =========================================== */
+        .edit-hotzone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+        .edit-toggle {
+            position: fixed;
+            top: clamp(0.5rem, 1.5vw, 1rem);
+            left: clamp(0.5rem, 1.5vw, 1rem);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            font-family: var(--font-mono);
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10001;
+            color: var(--text-primary);
+            letter-spacing: 0.05em;
+        }
+        .edit-toggle.show,
+        .edit-toggle.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .edit-toggle.active {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .editing-active [contenteditable] {
+            outline: 1px dashed var(--accent);
+            outline-offset: 3px;
+            cursor: text;
+        }
+
+        /* ===========================================
+           COMMON ELEMENTS
+        =========================================== */
+        .accent-line {
+            width: clamp(40px, 6vw, 80px);
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+            margin-bottom: var(--element-gap);
+        }
+
+        .slide-num {
+            position: absolute;
+            top: clamp(1rem, 3vw, 2rem);
+            right: clamp(1rem, 3vw, 2rem);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            opacity: 0.45;
+            z-index: 2;
+            letter-spacing: 0.1em;
+        }
+
+        .section-tag {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: clamp(0.5rem, 1vw, 0.8rem);
+        }
+
+        /* ===========================================
+           TITLE SLIDE
+        =========================================== */
+        .title-slide .slide-content {
+            justify-content: center;
+            gap: clamp(0.6rem, 2vh, 1.5rem);
+        }
+
+        .title-slide h1 {
+            font-size: clamp(2.2rem, 7vw, 5.5rem);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            color: var(--text-primary);
+            line-height: 1.0;
+        }
+        .title-slide h1 .accent-word { color: var(--accent); }
+
+        .title-slide .subtitle {
+            font-size: clamp(1rem, 2.2vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 700px;
+            font-family: var(--font-body);
+            font-weight: 300;
+        }
+
+        .title-slide .meta {
+            font-size: var(--small-size);
+            color: var(--accent);
+            font-family: var(--font-mono);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-top: clamp(0.5rem, 2vh, 1.5rem);
+        }
+
+        /* ===========================================
+           LINE SLIDE — single memorable line, centered
+        =========================================== */
+        .line-slide .slide-content {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .line-slide .big-line {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 5vw, 3.8rem);
+            font-weight: 700;
+            line-height: 1.15;
+            max-width: 1000px;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+        .line-slide .big-line .accent-word {
+            color: var(--accent);
+        }
+        .line-slide .attribution {
+            margin-top: clamp(1rem, 3vh, 2rem);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+        }
+
+        /* ===========================================
+           BULLET LIST
+        =========================================== */
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.8rem, 1.8vh, 1.4rem);
+            margin-top: var(--content-gap);
+        }
+        .bullet-list li {
+            position: relative;
+            padding-left: clamp(1.1rem, 2vw, 1.6rem);
+            line-height: 1.5;
+        }
+        .bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.65em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        /* ===========================================
+           QUOTE BLOCK
+        =========================================== */
+        .quote-block {
+            font-family: var(--font-display);
+            font-size: clamp(1.1rem, 2.6vw, 1.9rem);
+            font-weight: 500;
+            line-height: 1.3;
+            color: var(--text-primary);
+            border-left: 3px solid var(--accent);
+            padding-left: clamp(0.9rem, 2vw, 1.6rem);
+            max-width: min(85vw, 850px);
+        }
+        .quote-block .attr {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            margin-top: clamp(0.4rem, 1vh, 0.8rem);
+            font-weight: 400;
+            letter-spacing: 0.04em;
+        }
+
+        /* ===========================================
+           COMPONENT CARDS (4-grid)
+        =========================================== */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(0.6rem, 1.4vw, 1.2rem);
+            margin-top: var(--content-gap);
+        }
+        @media (max-width: 900px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .grid-4 { grid-template-columns: 1fr; } }
+
+        .comp-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-left: 3px solid var(--accent);
+            border-radius: 10px;
+            padding: clamp(0.85rem, 1.6vw, 1.4rem);
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .comp-card:hover {
+            border-color: rgba(255,255,255,0.14);
+            transform: translateY(-2px);
+        }
+        .comp-card .icon {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.05vw, 0.9rem);
+            font-weight: 600;
+            color: var(--accent);
+            opacity: 0.7;
+            margin-bottom: clamp(0.3rem, 0.5vw, 0.55rem);
+            letter-spacing: 0.1em;
+        }
+        .comp-card h3 {
+            font-size: clamp(0.98rem, 1.5vw, 1.2rem);
+            margin-bottom: clamp(0.25rem, 0.5vw, 0.5rem);
+            color: var(--text-primary);
+            line-height: 1.15;
+        }
+        .comp-card p {
+            font-size: var(--small-size);
+            line-height: 1.45;
+        }
+
+        /* ===========================================
+           TWO-COLUMN CONTRAST
+        =========================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1rem, 3vw, 3rem);
+            margin-top: var(--content-gap);
+            width: 100%;
+        }
+        @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+        .col-box {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: clamp(1rem, 2vw, 1.75rem);
+        }
+        .col-box.retrieval { border-top: 3px solid var(--text-secondary); }
+        .col-box.adaptation { border-top: 3px solid var(--accent); }
+
+        .col-box h3 {
+            font-size: clamp(1rem, 1.7vw, 1.4rem);
+            margin-bottom: clamp(0.4rem, 1vh, 0.8rem);
+            color: var(--text-primary);
+        }
+        .col-box h3 .tag {
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 0.85vw, 0.7rem);
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: block;
+            font-weight: 400;
+            margin-bottom: 0.3em;
+        }
+        .col-box.retrieval h3 .tag { color: var(--text-secondary); }
+        .col-box p {
+            font-size: var(--small-size);
+            line-height: 1.5;
+            margin-bottom: clamp(0.3rem, 0.7vh, 0.6rem);
+        }
+        .col-box ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.25rem, 0.6vh, 0.5rem);
+            margin-top: clamp(0.4rem, 1vh, 0.7rem);
+        }
+        .col-box li {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.4;
+            position: relative;
+            padding-left: 1.1em;
+        }
+        .col-box li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            opacity: 0.6;
+        }
+        .col-box.retrieval li::before { color: var(--text-secondary); opacity: 0.5; }
+
+        /* ===========================================
+           4-FILE FRAME (autoresearch / our demo)
+        =========================================== */
+        .file-frame {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(0.7rem, 1.5vw, 1.2rem);
+            margin-top: var(--content-gap);
+            width: 100%;
+            max-width: 900px;
+        }
+        @media (max-width: 600px) { .file-frame { grid-template-columns: 1fr; } }
+
+        .file-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: clamp(0.8rem, 1.5vw, 1.3rem);
+            position: relative;
+            overflow: hidden;
+        }
+        .file-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 60%, rgba(240, 165, 0, 0.03) 100%);
+            pointer-events: none;
+        }
+        .file-card .file-name {
+            font-family: var(--font-mono);
+            font-size: clamp(0.85rem, 1.3vw, 1.1rem);
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: clamp(0.2rem, 0.5vw, 0.4rem);
+        }
+        .file-card .file-role {
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 0.95vw, 0.8rem);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: clamp(0.4rem, 1vw, 0.7rem);
+        }
+        .file-card .file-desc {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+        .file-card .file-actor {
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            font-family: var(--font-mono);
+            margin-top: clamp(0.4rem, 0.9vw, 0.7rem);
+            padding-top: clamp(0.4rem, 0.9vw, 0.7rem);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            color: var(--accent-secondary);
+        }
+
+        /* ===========================================
+           LOOP DIAGRAM (ASCII-ish flow)
+        =========================================== */
+        .loop-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(0.4rem, 1.2vw, 1rem);
+            flex-wrap: wrap;
+            margin-top: var(--content-gap);
+            width: 100%;
+        }
+        .loop-node {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: clamp(0.55rem, 1.1vw, 0.85rem) clamp(0.85rem, 1.6vw, 1.3rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.78rem, 1.15vw, 1rem);
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        .loop-node.active {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .loop-arrow {
+            font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+            color: var(--accent);
+            opacity: 0.6;
+        }
+
+        /* ===========================================
+           TERMINAL BLOCK
+        =========================================== */
+        .terminal {
+            background: #050813;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: clamp(0.9rem, 2vw, 1.6rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.78rem, 1.15vw, 1rem);
+            line-height: 1.55;
+            color: var(--text-primary);
+            margin-top: var(--content-gap);
+            max-width: min(95vw, 900px);
+            overflow: hidden;
+            position: relative;
+        }
+        .terminal::before {
+            content: '● ● ●';
+            position: absolute;
+            top: clamp(0.4rem, 0.8vw, 0.7rem);
+            left: clamp(0.7rem, 1.4vw, 1rem);
+            font-size: clamp(0.5rem, 0.8vw, 0.65rem);
+            letter-spacing: 0.3em;
+            color: var(--text-secondary);
+            opacity: 0.4;
+        }
+        .terminal-body { margin-top: clamp(0.6rem, 1vw, 0.9rem); }
+        .terminal .prompt { color: var(--accent); }
+        .terminal .arg { color: var(--text-primary); }
+        .terminal .comment { color: var(--text-secondary); opacity: 0.7; }
+        .terminal .response { color: var(--accent-secondary); font-style: italic; display: block; margin-top: 0.3em; margin-left: 0; padding-left: 0; }
+        .terminal-section { margin-top: clamp(0.6rem, 1vw, 1rem); }
+
+        /* ===========================================
+           FAILURE TABLE
+        =========================================== */
+        .fail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--content-gap);
+            font-size: var(--body-size);
+            max-width: 1100px;
+        }
+        .fail-table th, .fail-table td {
+            text-align: left;
+            padding: clamp(0.45rem, 1vw, 0.85rem) clamp(0.5rem, 1.1vw, 1rem);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .fail-table th {
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: clamp(0.65rem, 1vw, 0.85rem);
+            letter-spacing: 0.08em;
+        }
+        .fail-table td { color: var(--text-secondary); line-height: 1.4; }
+        .fail-table td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-family: var(--font-mono);
+            font-size: clamp(0.78rem, 1.1vw, 0.95rem);
+            white-space: nowrap;
+        }
+
+        /* ===========================================
+           NOTE / CALLOUT
+        =========================================== */
+        .note {
+            margin-top: var(--content-gap);
+            padding: clamp(0.5rem, 1.2vh, 0.85rem) clamp(0.8rem, 1.6vw, 1.2rem);
+            border-left: 3px solid var(--accent-secondary);
+            background: rgba(125, 211, 192, 0.06);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            border-radius: 0 4px 4px 0;
+            max-width: min(90vw, 900px);
+            line-height: 1.5;
+        }
+        .note strong {
+            color: var(--accent-secondary);
+            font-family: var(--font-mono);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: clamp(0.6rem, 0.95vw, 0.78rem);
+            margin-right: 0.4em;
+        }
+
+        /* ===========================================
+           PROGRESS BAR + NAV DOTS
+        =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--accent);
+            z-index: 9999;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .nav-dots {
+            position: fixed;
+            right: clamp(0.5rem, 1.5vw, 1rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            opacity: 0.3;
+            cursor: pointer;
+            transition: opacity 0.3s, transform 0.3s, background 0.3s;
+            border: none;
+            padding: 0;
+        }
+        .nav-dot.active {
+            opacity: 1;
+            background: var(--accent);
+            transform: scale(1.4);
+        }
+
+        /* Demo screen — full-bleed terminal */
+        .demo-screen .slide-content {
+            justify-content: center;
+            align-items: center;
+            gap: clamp(0.8rem, 2vh, 1.5rem);
+        }
+        .demo-screen .big-cue {
+            font-family: var(--font-mono);
+            font-size: clamp(1.3rem, 3.5vw, 2.4rem);
+            color: var(--accent);
+            letter-spacing: 0.05em;
+        }
+        .demo-screen .cue-sub {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* before/after comparison */
+        .compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(0.8rem, 2vw, 1.6rem);
+            width: 100%;
+            margin-top: var(--content-gap);
+        }
+        @media (max-width: 700px) { .compare { grid-template-columns: 1fr; } }
+        .compare-col {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: clamp(0.9rem, 1.8vw, 1.5rem);
+        }
+        .compare-col.before { border-top: 3px solid var(--text-secondary); }
+        .compare-col.after  { border-top: 3px solid var(--accent); }
+        .compare-col .label {
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 0.95vw, 0.8rem);
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: clamp(0.4rem, 0.9vw, 0.7rem);
+        }
+        .compare-col.before .label { color: var(--text-secondary); }
+        .compare-col .memory-state {
+            font-family: var(--font-mono);
+            font-size: clamp(0.75rem, 1.1vw, 0.92rem);
+            color: var(--text-secondary);
+            margin-bottom: clamp(0.5rem, 1vw, 0.8rem);
+            padding: clamp(0.4rem, 0.8vw, 0.6rem) clamp(0.6rem, 1vw, 0.8rem);
+            background: rgba(255,255,255,0.03);
+            border-radius: 4px;
+            border-left: 2px solid var(--accent-secondary);
+            line-height: 1.5;
+        }
+        .compare-col .response {
+            font-size: clamp(0.85rem, 1.3vw, 1.05rem);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-style: italic;
+        }
+        .compare-col .response em {
+            color: var(--accent);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        /* CTA / final */
+        .cta-link {
+            font-family: var(--font-mono);
+            font-size: clamp(0.95rem, 1.6vw, 1.25rem);
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(240, 165, 0, 0.4);
+            padding-bottom: 2px;
+        }
+        .cta-link:hover {
+            border-bottom-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- Inline editing controls — invisible hotzone top-left, button appears on hover/E key -->
+    <div class="edit-hotzone" id="editHotzone" title="Hover or press E to edit"></div>
+    <button class="edit-toggle" id="editToggle" title="Edit mode (E)">Edit</button>
+
+    <!-- ==========================================================
+         SLIDE 1 — TITLE
+    ========================================================== -->
+    <section class="slide title-slide mesh-bg bg-orbit">
+        <div class="slide-content">
+            <div class="accent-line reveal"></div>
+            <h1 class="reveal">Designing<br><span class="accent-word">Self-Improving</span><br>Systems with LLMs</h1>
+            <p class="subtitle reveal">From chatbots to closed-loop software.</p>
+            <p class="meta reveal">Dragos Hont · Software Engineering</p>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 2 — OPENING HOOK
+    ========================================================== -->
+    <section class="slide mesh-bg bg-orbit">
+        <span class="slide-num">01</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 1 · the gap</div>
+            <h2 class="reveal" style="max-width: 950px;">Most LLM usage today is fundamentally <em>stateless</em>.</h2>
+            <p class="reveal" style="max-width: 750px; margin-top: var(--element-gap);">We prompt. We get an answer. And all learning dies at the end of the interaction.</p>
+            <p class="reveal" style="max-width: 750px;">The model doesn't remember you. The system doesn't remember anything you said yesterday. And tomorrow it'll make the same mistake again.</p>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 3 — THE SHIFT
+    ========================================================== -->
+    <section class="slide mesh-bg bg-lines">
+        <span class="slide-num">02</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 1 · the shift</div>
+            <h2 class="reveal">The real shift isn't to <em>better prompts</em>.<br>It's not to <em>bigger models</em>.</h2>
+            <h2 class="reveal" style="margin-top: var(--element-gap); color: var(--accent);">It's to better systems.</h2>
+            <p class="reveal" style="max-width: 800px; margin-top: var(--content-gap);">Systems where LLMs operate inside <strong>closed loops</strong>, produce <strong>persistent artifacts</strong>, evaluate their own outputs, and get better over time — without anyone retraining anything.</p>
+            <p class="reveal" style="max-width: 800px;">Familiar engineering principles — state, evaluation, iteration, observability — applied to a new kind of system.</p>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 4 — THE LINE: least interesting component
+    ========================================================== -->
+    <section class="slide line-slide mesh-bg bg-orbit">
+        <span class="slide-num">03</span>
+        <div class="slide-content">
+            <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
+            <div class="big-line reveal">
+                The model is increasingly becoming<br>the <span class="accent-word">least interesting</span> component.
+            </div>
+            <div class="attribution reveal">// THE TALK'S CENTRAL CLAIM</div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 5 — THE LOOP
+    ========================================================== -->
+    <section class="slide bg-grid">
+        <span class="slide-num">04</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 2 · defining the loop</div>
+            <h2 class="reveal">A self-improving system is a closed loop.</h2>
+            <div class="loop-flow reveal" style="margin-top: var(--content-gap);">
+                <div class="loop-node active">act</div>
+                <span class="loop-arrow">→</span>
+                <div class="loop-node active">evaluate</div>
+                <span class="loop-arrow">→</span>
+                <div class="loop-node active">persist</div>
+                <span class="loop-arrow">→</span>
+                <div class="loop-node active">adapt</div>
+                <span class="loop-arrow">↻</span>
+            </div>
+            <p class="reveal" style="max-width: 800px; margin-top: var(--content-gap);">The model does one part of one step. The system does everything else.<br>That "everything else" is where the engineering lives — and where improvement compounds.</p>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 6 — COMPONENTS OF THE LOOP
+    ========================================================== -->
+    <section class="slide bg-grid">
+        <span class="slide-num">05</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 2 · what makes the loop</div>
+            <h2 class="reveal">Four load-bearing pieces.</h2>
+            <div class="grid-4">
+                <div class="comp-card reveal-scale" style="transition-delay: 0.1s;">
+                    <div class="icon">01 · EVALUATORS</div>
+                    <h3>Turn outputs into signals.</h3>
+                    <p>Programmatic judges — sometimes deterministic, sometimes LLM-based — that convert unstructured outputs into structured pass/fail, scores, or extracted facts.</p>
+                </div>
+                <div class="comp-card reveal-scale" style="transition-delay: 0.18s;">
+                    <div class="icon">02 · MEMORY</div>
+                    <h3>State outlives the request.</h3>
+                    <p>Persistent storage — JSON on disk in the smallest version, a database in production — that survives the call and shapes the next one.</p>
+                </div>
+                <div class="comp-card reveal-scale" style="transition-delay: 0.26s;">
+                    <div class="icon">03 · TELEMETRY</div>
+                    <h3>Execution traces, not vibes.</h3>
+                    <p>Every step recorded. Inputs, evaluator verdicts, memory deltas, next prompts. Without traces, the loop is undebuggable.</p>
+                </div>
+                <div class="comp-card reveal-scale" style="transition-delay: 0.34s;">
+                    <div class="icon">04 · RUNTIME ADAPTATION</div>
+                    <h3>The prompt changes.</h3>
+                    <p>Because the memory changed. No gradients. No retraining. The next prompt is mechanically different — and the audience can inspect why.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 7 — RETRIEVAL VS ADAPTATION
+    ========================================================== -->
+    <section class="slide mesh-bg bg-lines">
+        <span class="slide-num">06</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 3 · the dichotomy</div>
+            <h2 class="reveal">Retrieval ≠ Behavioral adaptation.</h2>
+            <div class="two-col reveal">
+                <div class="col-box retrieval">
+                    <h3><span class="tag">retrieval</span>Inject context per query.</h3>
+                    <p>Per-request lookup. Same model, same behavior style. Documents in, answer out.</p>
+                    <ul>
+                        <li>Context is fetched, then thrown away</li>
+                        <li>Next request starts fresh</li>
+                        <li>The system doesn't <em>change</em></li>
+                        <li>Useful, necessary, not the same thing</li>
+                    </ul>
+                </div>
+                <div class="col-box adaptation">
+                    <h3><span class="tag">behavioral adaptation</span>State mutates the system.</h3>
+                    <p>Outcomes update persistent state. The next prompt is constructed differently because of what happened.</p>
+                    <ul>
+                        <li>Feedback compounds into structure</li>
+                        <li>Future behavior depends on past behavior</li>
+                        <li>The system <em>changes</em></li>
+                        <li>This is the thing that improves</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 8 — THE LINE: retrieval vs adaptation
+    ========================================================== -->
+    <section class="slide line-slide mesh-bg bg-orbit">
+        <span class="slide-num">07</span>
+        <div class="slide-content">
+            <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
+            <div class="big-line reveal">
+                Retrieval alone is not self-improvement.<br>
+                <span class="accent-word">Behavioral adaptation</span> is.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 9 — AUTORESEARCH (canonical example)
+    ========================================================== -->
+    <section class="slide bg-grid">
+        <span class="slide-num">08</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 4 · canonical example</div>
+            <h2 class="reveal"><code style="font-size: 0.85em;">karpathy/autoresearch</code> — the loop, in four files.</h2>
+            <p class="reveal" style="max-width: 800px; margin-top: var(--element-gap);">An AI agent runs research overnight on a single-GPU GPT training setup. ~100 experiments while you sleep.</p>
+            <div class="file-frame reveal">
+                <div class="file-card">
+                    <div class="file-name">program.md</div>
+                    <div class="file-role">orchestration / skill</div>
+                    <div class="file-desc">Plain-English instructions for the agent. The "research org code."</div>
+                    <div class="file-actor">→ human edits this</div>
+                </div>
+                <div class="file-card">
+                    <div class="file-name">train.py</div>
+                    <div class="file-role">behavioral adaptation</div>
+                    <div class="file-desc">The full GPT model + optimizer + loop. Architecture, hyperparams — all fair game.</div>
+                    <div class="file-actor">→ agent edits this</div>
+                </div>
+                <div class="file-card">
+                    <div class="file-name">5-min budget + val_bpb</div>
+                    <div class="file-role">evaluator</div>
+                    <div class="file-desc">Fixed wall-clock budget per experiment. One scalar metric — lower is better. Deterministic.</div>
+                    <div class="file-actor">→ keep or discard</div>
+                </div>
+                <div class="file-card">
+                    <div class="file-name">results.tsv</div>
+                    <div class="file-role">memory / trace</div>
+                    <div class="file-desc">Every experiment, every metric. The agent reads its own history. Compounding context.</div>
+                    <div class="file-actor">→ next iteration uses this</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 10 — AUTORESEARCH ANCHOR LINE
+    ========================================================== -->
+    <section class="slide line-slide mesh-bg bg-orbit">
+        <span class="slide-num">09</span>
+        <div class="slide-content">
+            <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
+            <div class="big-line reveal">
+                The human edits <code style="font-size: 0.95em;">program.md</code>.<br>
+                The agent edits <code style="font-size: 0.95em;">train.py</code>.<br>
+                <span class="accent-word">Neither edits the model.</span>
+            </div>
+            <div class="attribution reveal">// AUTORESEARCH, IN ONE SENTENCE</div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 11 — OUR DEMO ARCHITECTURE
+    ========================================================== -->
+    <section class="slide bg-grid">
+        <span class="slide-num">10</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 5 · the demo</div>
+            <h2 class="reveal">Same idea. Smaller scope. ~170 lines of Python.</h2>
+            <p class="reveal" style="max-width: 800px; margin-top: var(--element-gap);">Local model via LM Studio. JSON on disk for memory. No frameworks. No vector DB. The architecture is the lesson.</p>
+            <div class="file-frame reveal" style="grid-template-columns: 1fr 1fr;">
+                <div class="file-card">
+                    <div class="file-name">planner.txt</div>
+                    <div class="file-role">orchestration</div>
+                    <div class="file-desc">System prompt that consumes <code>{memory_block}</code>. Asks the model to answer the user, respecting whatever memory contains.</div>
+                </div>
+                <div class="file-card">
+                    <div class="file-name">evaluator.txt</div>
+                    <div class="file-role">evaluator</div>
+                    <div class="file-desc">System prompt with strict JSON schema. Reads user feedback, emits structured preferences.</div>
+                </div>
+                <div class="file-card">
+                    <div class="file-name">memory.json</div>
+                    <div class="file-role">memory</div>
+                    <div class="file-desc">The persistent state. Likes, dislikes, constraints, notes. The file the audience watches mutate.</div>
+                </div>
+                <div class="file-card">
+                    <div class="file-name">demo.py</div>
+                    <div class="file-role">runtime / trace</div>
+                    <div class="file-desc">~170 lines. Four commands: ask / feedback / show / reset. Prints every step of the loop.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 12 — LIVE DEMO PLACEHOLDER
+    ========================================================== -->
+    <section class="slide demo-screen mesh-bg bg-orbit">
+        <span class="slide-num">11</span>
+        <div class="slide-content">
+            <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
+            <div class="big-cue reveal">→ live demo</div>
+            <div class="cue-sub reveal">switch to the terminal</div>
+            <div class="terminal reveal" style="margin-top: var(--content-gap);">
+                <div class="terminal-body">
+                    <div><span class="prompt">$</span> <span class="arg">python demo.py reset</span></div>
+                    <div><span class="prompt">$</span> <span class="arg">python demo.py ask "Suggest something fun for this weekend"</span></div>
+                    <div><span class="prompt">$</span> <span class="arg">python demo.py feedback "I dislike outdoor activities and I'm on a tight budget"</span></div>
+                    <div><span class="prompt">$</span> <span class="arg">python demo.py ask "Suggest something fun for this weekend"</span></div>
+                    <div><span class="prompt">$</span> <span class="arg">python demo.py show</span></div>
+                </div>
+            </div>
+            <p class="reveal" style="font-size: var(--small-size); color: var(--text-secondary); text-align: center; margin-top: var(--content-gap);">
+                <code>github.com/dragoshont/closed-loop-llm</code>
+            </p>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 13 — BEFORE / AFTER
+    ========================================================== -->
+    <section class="slide bg-grid">
+        <span class="slide-num">12</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 5 · what just happened</div>
+            <h2 class="reveal">Same prompt. Same model. Same temperature.</h2>
+            <div class="compare reveal">
+                <div class="compare-col before">
+                    <div class="label">Ask #1 — empty memory</div>
+                    <div class="memory-state">(no preferences known yet)</div>
+                    <div class="response">"Consider trying an <em>outdoor adventure like hiking</em> in your local nature reserve — fresh air, exercise, perfect for the weekend."</div>
+                </div>
+                <div class="compare-col after">
+                    <div class="label">Ask #2 — after feedback</div>
+                    <div class="memory-state">dislikes: outdoor activities<br>constraints: tight budget</div>
+                    <div class="response">"Consider exploring your local <em>library's digital resources</em> or joining an <em>online course</em> — <em>it's free</em> and can be done <em>from home</em>."</div>
+                </div>
+            </div>
+            <p class="reveal" style="text-align: center; margin-top: var(--content-gap); max-width: 800px; margin-left: auto; margin-right: auto;">The prompt template re-rendered because <code>memory.json</code> mutated. That's it. That's the loop.</p>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 14 — HONEST FRAMING: adaptation vs improvement
+         Density audit: 1 heading + 2 paragraphs + 1 callout note. Within limits.
+    ========================================================== -->
+    <section class="slide bg-grid">
+        <span class="slide-num">13</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 5 · be precise</div>
+            <h2 class="reveal">This demo shows <em>adaptation</em>. Not <em>improvement</em>.</h2>
+            <p class="reveal" style="max-width: 850px; margin-top: var(--element-gap);">The behavior changed. That's adaptation. But there's no goal-aligned metric, no convergence, nothing that lets me say the system is <strong>getting better</strong>.</p>
+            <p class="reveal" style="max-width: 850px;">Improvement = adaptation <strong>+</strong> a goal-aligned evaluator <strong>+</strong> iteration that converges. Autoresearch supplies the missing piece. This demo is the substrate.</p>
+            <div class="note reveal"><strong>credibility move</strong>Saying this out loud, before the skeptic in the third row raises a hand, is worth more than the demo itself.</div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 15 — FAILURE MODES
+    ========================================================== -->
+    <section class="slide bg-grid">
+        <span class="slide-num">14</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 6 · the dark side</div>
+            <h2 class="reveal">When the loop hurts you.</h2>
+            <table class="fail-table reveal">
+                <thead>
+                    <tr>
+                        <th>Failure mode</th>
+                        <th>What goes wrong</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>feedback poisoning</td><td>One bad signal contaminates all future behavior. No quarantine, no rollback.</td></tr>
+                    <tr><td>memory drift</td><td>Slow accumulation of contradictions. Union-merge never forgets, never resolves.</td></tr>
+                    <tr><td>stale memory</td><td>Preferences captured a year ago drive today's behavior. Recency unweighted.</td></tr>
+                    <tr><td>hallucination persistence</td><td>The evaluator extracted a confident lie. Now it's "fact" in memory forever.</td></tr>
+                    <tr><td>echo chambers</td><td>The system narrows. Surprise disappears. Personalization becomes a cage.</td></tr>
+                    <tr><td>evaluator failure</td><td>The LLM judging the LLM is wrong, confidently and silently. Turtles all the way down.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 16 — THE LINE: self-degradation
+    ========================================================== -->
+    <section class="slide line-slide mesh-bg bg-orbit">
+        <span class="slide-num">15</span>
+        <div class="slide-content">
+            <div class="accent-line reveal" style="margin: 0 auto var(--content-gap);"></div>
+            <div class="big-line reveal">
+                Self-improvement without guardrails<br>becomes <span class="accent-word">self-degradation</span>.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 17 — WHERE THE LEVERAGE IS (closing)
+         Density audit: 1 heading + 4 bullets (within 4–6 limit). Quote folded into final bullet.
+    ========================================================== -->
+    <section class="slide mesh-bg bg-lines">
+        <span class="slide-num">16</span>
+        <div class="slide-content">
+            <div class="section-tag reveal">§ 7 · where this lands</div>
+            <h2 class="reveal">Most production AI systems improve<br>at the <span style="color: var(--accent);">orchestration layer</span>.</h2>
+            <ul class="bullet-list">
+                <li class="reveal">Persistent skills accumulate. Reusable workflows compound.</li>
+                <li class="reveal">Eval-driven prompt iteration replaces ad-hoc prompt engineering.</li>
+                <li class="reveal">Execution traces become the dataset for the next round of iteration.</li>
+                <li class="reveal">The interesting question is no longer <em>“which model?”</em> — it's <em>“do we have the right loop?”</em></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SLIDE 18 — HANDOFF / THANKS
+    ========================================================== -->
+    <section class="slide title-slide mesh-bg">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="accent-line reveal" style="margin: 0 auto;"></div>
+            <h1 class="reveal" style="font-size: clamp(1.8rem, 5vw, 4rem);">Thank you.</h1>
+            <p class="subtitle reveal" style="max-width: 800px;">The model is the least interesting component.<br>The interesting work is the system around it.</p>
+            <p class="reveal" style="max-width: 750px; color: var(--text-secondary); margin-top: var(--element-gap); font-style: italic;">Mihai is about to take you deeper into exactly that — the harness, the engineering discipline. Hand off.</p>
+
+            <div class="reveal" style="margin-top: var(--content-gap); display: flex; flex-direction: column; gap: 0.6rem; align-items: center;">
+                <a href="https://github.com/dragoshont/closed-loop-llm" target="_blank" class="cta-link">github.com/dragoshont/closed-loop-llm</a>
+                <p style="font-size: var(--small-size); color: var(--text-secondary); max-width: 600px;">runnable demo · talk source · ~170 lines of stdlib Python</p>
+            </div>
+
+            <p class="meta reveal" style="margin-top: var(--content-gap);">Dragos Hont · @dragoshont</p>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         CONTROLLER
+    ========================================================== -->
+    <script>
+    (function () {
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('navDots');
+        const progressBar = document.getElementById('progressBar');
+        let currentSlide = 0;
+        let dots = [];
+
+        // Build nav dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Slide ${i + 1}`);
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+            dots.push(dot);
+        });
+
+        function updateUI() {
+            dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+            progressBar.style.width = ((currentSlide + 1) / slides.length * 100) + '%';
+        }
+
+        function goToSlide(i) {
+            if (i < 0 || i >= slides.length) return;
+            slides[i].scrollIntoView({ behavior: 'smooth' });
+            currentSlide = i;
+            updateUI();
+        }
+
+        // Reveal on intersection
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    const idx = Array.from(slides).indexOf(e.target);
+                    if (idx !== -1) { currentSlide = idx; updateUI(); }
+                }
+            });
+        }, { threshold: 0.5 });
+        slides.forEach(s => io.observe(s));
+
+        // Keyboard
+        document.addEventListener('keydown', (e) => {
+            if (e.target.getAttribute('contenteditable') === 'true') return;
+            switch (e.key) {
+                case 'ArrowDown': case 'ArrowRight': case ' ': case 'PageDown':
+                    e.preventDefault(); goToSlide(currentSlide + 1); break;
+                case 'ArrowUp': case 'ArrowLeft': case 'PageUp':
+                    e.preventDefault(); goToSlide(currentSlide - 1); break;
+                case 'Home': e.preventDefault(); goToSlide(0); break;
+                case 'End':  e.preventDefault(); goToSlide(slides.length - 1); break;
+            }
+        });
+
+        // Touch
+        let startY = 0;
+        document.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, { passive: true });
+        document.addEventListener('touchend',   (e) => {
+            const diff = startY - e.changedTouches[0].clientY;
+            if (Math.abs(diff) > 50) goToSlide(currentSlide + (diff > 0 ? 1 : -1));
+        }, { passive: true });
+
+
+    /* ==========================================================
+       INLINE EDITOR — opt-in, off by default
+       Press E or hover the top-left corner. Edits autosave
+       to localStorage on toggle-off or Ctrl+S.
+    ========================================================== */
+    (function () {
+        const hotzone = document.getElementById('editHotzone');
+        const toggleBtn = document.getElementById('editToggle');
+        const STORAGE_KEY = 'closed-loop-llm-slide-edits';
+        let isActive = false;
+        let hideTimeout = null;
+
+        function show() {
+            clearTimeout(hideTimeout);
+            toggleBtn.classList.add('show');
+        }
+        function hide() {
+            hideTimeout = setTimeout(() => {
+                if (!isActive) toggleBtn.classList.remove('show');
+            }, 400);
+        }
+
+        function save() {
+            try {
+                localStorage.setItem(STORAGE_KEY, document.body.innerHTML);
+            } catch (e) { /* localStorage may be unavailable in PDF export contexts */ }
+        }
+        function loadSaved() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) document.body.innerHTML = saved;
+            } catch (e) { /* same */ }
+        }
+
+        function toggleEditMode() {
+            isActive = !isActive;
+            document.body.classList.toggle('editing-active', isActive);
+            toggleBtn.classList.toggle('active', isActive);
+            toggleBtn.textContent = isActive ? 'Save (Ctrl+S)' : 'Edit';
+            document
+                .querySelectorAll('h1, h2, h3, p, li, td, .subtitle, .meta, .attr, .big-line, .file-name, .file-desc, .file-role, .file-actor, .response, .memory-state')
+                .forEach(el => el.setAttribute('contenteditable', isActive));
+            if (!isActive) save();
+        }
+
+        hotzone.addEventListener('mouseenter', show);
+        hotzone.addEventListener('mouseleave', hide);
+        toggleBtn.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        toggleBtn.addEventListener('mouseleave', hide);
+        hotzone.addEventListener('click', toggleEditMode);
+        toggleBtn.addEventListener('click', toggleEditMode);
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') &&
+                !e.ctrlKey && !e.metaKey && !e.altKey &&
+                !e.target.getAttribute('contenteditable')) {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            if (e.ctrlKey && (e.key === 's' || e.key === 'S') && isActive) {
+                e.preventDefault();
+                save();
+            }
+        });
+
+        // loadSaved();  // disabled by default — opt-in if you want to persist edits across sessions
+    })();
+        // Initial reveal
+        slides[0].classList.add('visible');
+        updateUI();
+    })();
+    </script>
+</body>
+</html>

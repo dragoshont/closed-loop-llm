@@ -82,7 +82,10 @@ This demo is the smallest possible artifact of that second clause.
 │   │   └── evaluator.txt        ← system prompt that returns strict JSON
 │   ├── memory.baseline.json     ← reset target (empty state)
 │   └── reset.ps1                ← PowerShell helper for resetting memory
+├── slides/                      ← talk slide deck (open index.html in any browser)
+│   └── index.html               ← self-contained HTML, no dependencies
 └── talk/                        ← talk content (read-only, not needed to run)
+    ├── agenda.md                ← 25-min talk + 5-min Q&A timing plan
     ├── core_thesis.md
     ├── audience_takeaways.md
     ├── objections_and_answers.md
