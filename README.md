@@ -283,4 +283,4 @@ live separately (not in this repo).
 
 ## License
 
-Treat as MIT, copy, fork, present, modify, share.
+MIT. See [`LICENSE`](./LICENSE). Copy, fork, present, modify, share.
