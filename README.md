@@ -8,17 +8,6 @@ Self-Improving Systems with LLMs."**
 ask → evaluate → persist → adapt → ask
 ```
 
-**What you'll see in 3 commands:**
-
-1. Ask a generic question → get a generic answer.
-2. Give a piece of feedback → an evaluator extracts structured preferences into `memory.json`.
-3. Ask the same question again → different answer. Same model. Same temperature.
-
-No vector DB. No LangChain. No frameworks. No fine-tuning. ~170 lines of
-stdlib Python and two prompt files. That is the entire point.
-
----
-
 ## The loop, in commands
 
 After the [setup](#setup-5-minutes), the entire demo is four commands:
@@ -40,12 +29,44 @@ demo.py ask      "Suggest something fun for this weekend"
 
 That shift — same prompt in, different category of answer out, *because the
 memory changed and the prompt template re-rendered* — is the whole demo.
+No vector DB. No LangChain. No frameworks. No fine-tuning. ~170 lines of
+stdlib Python and two prompt files.
 
 > Run the commands using your platform's Python launcher (e.g. `python demo.py …`,
 > `python3 demo.py …`, or `py .\demo.py …` on Windows) from inside the `demo/`
 > folder. The default model id matches the recommended setup below. If you load
 > a different model, set the `LMSTUDIO_MODEL` environment variable — see
 > [Configuration](#configuration).
+
+## What this demo shows (and what it deliberately doesn't)
+
+It's worth being precise: this demo proves the **mechanism**, not the
+**improvement**.
+
+**What it shows:**
+
+- A closed loop with persistent state external to the model
+- An evaluator that turns unstructured feedback into structured memory
+- Behavioral change at the orchestration layer, without touching weights
+- That all of the above fits in a folder you can `cat`
+
+**What it deliberately doesn't show:**
+
+- Convergence toward a goal over many turns
+- A quality metric that improves with iteration
+- Anything that could be called "learning" in the rigorous sense
+
+That distinction is the talk's point. *Adaptation* (this demo) plus a
+*goal-aligned evaluator* (e.g. [karpathy/autoresearch](https://github.com/karpathy/autoresearch)'s
+`val_bpb` + keep-or-discard rule) is what produces *improvement*. This repo
+is the substrate; goal-aligned scoring is what you'd add on top to make a
+system that genuinely gets better at something measurable.
+
+The talk's central claim:
+
+> Retrieval alone is not self-improvement. Behavioral adaptation is.
+
+This demo is the smallest possible artifact of that second clause.
 
 ---
 
@@ -251,13 +272,10 @@ Things to change to explore the architecture:
 > evaluators, telemetry, and runtime adaptation — **not** through continuous
 > retraining of model weights.
 
-Or, more bluntly:
-
-> Retrieval alone is not self-improvement. Behavioral adaptation is.
-
 The talk argues the **model is increasingly becoming the least interesting
-component**. This repo exists to make that claim runnable on your laptop in
-under five minutes.
+component**. This repo exists to make the *adaptation* half of that claim
+runnable on your laptop in under five minutes. The *improvement* half lives
+one layer up — see ["What this demo shows (and what it deliberately doesn't)"](#what-this-demo-shows-and-what-it-deliberately-doesnt).
 
 For the full argument see [`talk/core_thesis.md`](./talk/core_thesis.md) and
 [`talk/audience_takeaways.md`](./talk/audience_takeaways.md). For pre-emptive
